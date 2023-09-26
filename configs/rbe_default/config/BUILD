@@ -29,9 +29,5 @@ platform(
     exec_properties = {
         "container-image": "docker://l.gcr.io/google/rbe-ubuntu16-04@sha256:f6568d8168b14aafd1b707019927a63c2d37113a03bcee188218f99bd0327ea1",
         "OSFamily": "Linux",
-        #"dockerSiblingContainers": "True",
-        #"dockerNetwork": "standard",
-        #"dockerRunAsRoot": "True",
-        #"dockerPrivileged": "True",
     },
 )

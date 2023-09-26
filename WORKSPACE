@@ -16,13 +16,13 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "7cbf1a2591520c2491aa35339f227775f4d3adf6"
-LLVM_SHA256 = "c78c94b2a03b2cf6ef1ba035c31a6f1b0bb7913da8af5aa8d5c2061f6499d589"
+LLVM_COMMIT = "e19b7dc36bc047b9eb72078d034596be766da350" # 17.0.1
+LLVM_SHA256 = "17b66c0cf44db4869e2193c61503a0c86f3e903bb907995db3d09e2bc77ccbde"
 
 http_archive(
     name = "llvm-raw",
     build_file_content = "# empty",
-    #sha256 = LLVM_SHA256,
+    sha256 = LLVM_SHA256,
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
 )
@@ -31,31 +31,17 @@ load("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
 
 llvm_configure(name = "llvm-project")
 
-load("@llvm-raw//utils/bazel:terminfo.bzl", "llvm_terminfo_from_env")
-
-maybe(
-    llvm_terminfo_from_env,
-    name = "llvm_terminfo",
-)
+llvm_configure(name = "llvm-project")
 
 maybe(
     http_archive,
-    name = "zlib",
-    build_file = "@llvm-raw//utils/bazel/third_party_build:zlib.BUILD",
-    sha256 = "91844808532e5ce316b3c010929493c0244f3d37593afd6de04f71821d5136d9",
-    strip_prefix = "zlib-1.2.12",
-    urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/zlib.net/zlib-1.2.12.tar.gz",
-        "https://zlib.net/zlib-1.2.12.tar.gz",
-    ],
-)
-
-load("@llvm-raw//utils/bazel:zlib.bzl", "llvm_zlib_from_env")
-
-maybe(
-    llvm_zlib_from_env,
     name = "llvm_zlib",
-    external_zlib = "@zlib",
+    build_file = "@llvm-raw//utils/bazel/third_party_build:zlib-ng.BUILD",
+    sha256 = "e36bb346c00472a1f9ff2a0a4643e590a254be6379da7cddd9daeb9a7f296731",
+    strip_prefix = "zlib-ng-2.0.7",
+    urls = [
+        "https://github.com/zlib-ng/zlib-ng/archive/refs/tags/2.0.7.zip",
+    ],
 )
 
 maybe(
@@ -95,14 +81,6 @@ http_archive(
 )
 ## END LLVM ##
 
-load("@io_buildbuddy_buildbuddy_toolchain//:deps.bzl", "buildbuddy_deps")
-
-buildbuddy_deps()
-
-load("@io_buildbuddy_buildbuddy_toolchain//:rules.bzl", "buildbuddy")
-
-buildbuddy(name = "buildbuddy_toolchain")
-
 local_repository(
     name = "rbe_default",
     path = "configs/rbe_default",
@@ -132,3 +110,15 @@ register_toolchains(
     #"@zig_sdk//toolchain:darwin_amd64",
     #"@zig_sdk//toolchain:darwin_arm64",
 )
+## END ZIG CC ##
+
+http_archive(
+    name = "rules_pkg",
+    urls = [
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
+        "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
+    ],
+    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
+)
+load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+rules_pkg_dependencies()
