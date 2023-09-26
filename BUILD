@@ -26,7 +26,6 @@ pkg_tar(
     },
 )
 
-
 pkg_tar(
     name = "llvm_bins",
     strip_prefix = "external/llvm-project/llvm",
@@ -41,36 +40,23 @@ pkg_tar(
         "llvm-strip": "./llvm-objcopy",
     },
     empty_files = [
-        "llvm-cov",
-        "llvm-dwp",
-        "llvm-objdump",
-        "llvm-profdata",
+        "bin/llvm-cov",
+        "bin/llvm-dwp",
+        "bin/llvm-objdump",
+        "bin/llvm-profdata",
     ],
 )
 
-#pkg_tar(
-#    name = "clang_lib_headers",
-#    srcs = [
-#        "@llvm-raw//:clang_lib_headers",
-#    ],
-#    package_dir = "lib/clang/17.0.1/include",
-#)
-#
-#pkg_files(
-#    name = "libcxx_include",
-#    srcs = [
-#        "@llvm-raw//:libcxx_include",
-#    ],
-#    prefix = "include/c++/v1",
-#)
-
 pkg_tar(
     name = "dist",
+    srcs = [
+	"@llvm-raw//:clang_lib_headers",
+	"@llvm-raw//:libcxx_include",
+    ],
     deps = [
         ":clang_bins",
         ":lld_bins",
         ":llvm_bins",
-	":@llvm-raw//:libcxx_include",
     ],
 )
 

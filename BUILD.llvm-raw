@@ -1,24 +1,24 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "pkg_filegroup")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
-filegroup(
+clang_lib_headers_files = glob(["clang/lib/Headers/**/*"])
+
+pkg_files(
     name = "clang_lib_headers",
-    srcs = glob(["clang/lib/Headers/**/*"], exclude=["clang/lib/Headers/*.txt"]),
+    srcs = clang_lib_headers_files,
+    # Needed to avoid name collisions, see 
+    # https://bazelbuild.slack.com/archives/CD42R4HJL/p1695760404382009
+    renames = {f: f for f in clang_lib_headers_files},
+    prefix = "lib/clang/17.0.1/include",
 )
 
 
-filegroup(
-    name = "libcxx_include_raw",
-    srcs = glob(["libcxx/include/**"], exclude=["**/pstl_backends/**"], exclude_directories=1),
-)
+libcxx_include_files = glob(["libcxx/include/**"])
 
-#pkg_files(
-#    name = "libcxx_include",
-#    srcs = glob(["libcxx/include/**"], exclude=["**/pstl_backends/**"], exclude_directories=1),
-#    strip_prefix = "external/llvm-raw",
-#    prefix = "./",
-#    renames = {},
-#)
-#
-#print(glob(["libcxx/include/**"]))
+pkg_files(
+    name = "libcxx_include",
+    srcs = libcxx_include_files,
+    renames = {f: f for f in libcxx_include_files},
+    prefix = "include/c++/v1",
+)
