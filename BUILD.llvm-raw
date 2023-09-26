@@ -1,0 +1,24 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "pkg_filegroup")
+
+filegroup(
+    name = "clang_lib_headers",
+    srcs = glob(["clang/lib/Headers/**/*"], exclude=["clang/lib/Headers/*.txt"]),
+)
+
+
+filegroup(
+    name = "libcxx_include_raw",
+    srcs = glob(["libcxx/include/**"], exclude=["**/pstl_backends/**"], exclude_directories=1),
+)
+
+#pkg_files(
+#    name = "libcxx_include",
+#    srcs = glob(["libcxx/include/**"], exclude=["**/pstl_backends/**"], exclude_directories=1),
+#    strip_prefix = "external/llvm-raw",
+#    prefix = "./",
+#    renames = {},
+#)
+#
+#print(glob(["libcxx/include/**"]))

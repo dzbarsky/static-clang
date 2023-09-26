@@ -1,4 +1,5 @@
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
 pkg_tar(
     name = "clang_bins",
@@ -39,7 +40,29 @@ pkg_tar(
     symlinks = {
         "llvm-strip": "./llvm-objcopy",
     },
+    empty_files = [
+        "llvm-cov",
+        "llvm-dwp",
+        "llvm-objdump",
+        "llvm-profdata",
+    ],
 )
+
+#pkg_tar(
+#    name = "clang_lib_headers",
+#    srcs = [
+#        "@llvm-raw//:clang_lib_headers",
+#    ],
+#    package_dir = "lib/clang/17.0.1/include",
+#)
+#
+#pkg_files(
+#    name = "libcxx_include",
+#    srcs = [
+#        "@llvm-raw//:libcxx_include",
+#    ],
+#    prefix = "include/c++/v1",
+#)
 
 pkg_tar(
     name = "dist",
@@ -47,13 +70,8 @@ pkg_tar(
         ":clang_bins",
         ":lld_bins",
         ":llvm_bins",
+	":@llvm-raw//:libcxx_include",
     ],
-)
-
-pkg_tar(
-    name = "gz_dist",
-    extension = ".tar.gz",
-    deps = [":dist"],
 )
 
 pkg_tar(
