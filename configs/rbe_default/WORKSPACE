@@ -1,0 +1,2 @@
+# DO NOT EDIT: automatically generated WORKSPACE file for _rbe_autoconfig rule
+workspace(name = "rbe_default")

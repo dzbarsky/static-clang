@@ -1,0 +1,1 @@
+echo $(find ./cc -type f | sort -n)
