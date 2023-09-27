@@ -2,16 +2,39 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 
+genrule(
+    name = "gen_config_site",
+    outs = ["libcxx/include/__config_site"],
+    cmd = """echo '
+#ifndef _LIBCPP___CONFIG_SITE
+#define _LIBCPP___CONFIG_SITE
+
+#define _LIBCPP_ABI_VERSION 1
+#define _LIBCPP_ABI_NAMESPACE __1
+#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS
+#define _LIBCPP_ENABLE_ASSERTIONS_DEFAULT 0
+
+#endif // _LIBCPP___CONFIG_SITE' > $@""",
+)
+
+# TODO: gen module.modulemap
+# See https://github.com/llvm/llvm-project/blob/9eeb0293e27c0f1b44304fd9681dcd88fd9edc0a/llvm/utils/gn/secondary/libcxx/include/BUILD.gn#L62-L72
+
 pkg_files(
     name = "clang_lib_headers",
-    srcs = glob(["clang/lib/Headers/**/*"]),
+    srcs = glob(["clang/lib/Headers/**/*"], exclude = ["**/*.txt"]),
     strip_prefix = "clang/lib/Headers",
     prefix = "lib/clang/17.0.1/include",
 )
 
 pkg_files(
     name = "libcxx_include",
-    srcs = glob(["libcxx/include/**"]),
+    srcs = glob(["libcxx/include/**"], exclude = [
+        "libcxx/include/CMakeLists.txt",
+        "libcxx/include/__config_site.in",
+    ]) + [
+        "libcxx/include/__config_site",
+    ],
     strip_prefix = "libcxx/include",
     prefix = "include/c++/v1",
 )
