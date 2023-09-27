@@ -26,11 +26,11 @@ http_archive(
     sha256 = LLVM_SHA256,
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
+    patch_args = ["-p1"],
+    patches = ["//:llvm.patch"],
 )
 
 load("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
-
-llvm_configure(name = "llvm-project")
 
 llvm_configure(name = "llvm-project")
 
@@ -73,13 +73,6 @@ maybe(
         "https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz"
     ],
 )
-
-http_archive(
-    name = "io_buildbuddy_buildbuddy_toolchain",
-    sha256 = "e899f235b36cb901b678bd6f55c1229df23fcbc7921ac7a3585d29bff2bf9cfd",
-    strip_prefix = "buildbuddy-toolchain-fd351ca8f152d66fc97f9d98009e0ae000854e8f",
-    urls = ["https://github.com/buildbuddy-io/buildbuddy-toolchain/archive/fd351ca8f152d66fc97f9d98009e0ae000854e8f.tar.gz"],
-)
 ## END LLVM ##
 
 local_repository(
@@ -106,11 +99,6 @@ load("@hermetic_cc_toolchain//toolchain:defs.bzl", zig_toolchains = "toolchains"
 # download URL.
 zig_toolchains()
 
-register_toolchains(
-    "@zig_sdk//libc_aware/toolchain:x86_64-linux-musl",
-    #"@zig_sdk//toolchain:darwin_amd64",
-    #"@zig_sdk//toolchain:darwin_arm64",
-)
 ## END ZIG CC ##
 
 http_archive(
@@ -123,3 +111,14 @@ http_archive(
 )
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
 rules_pkg_dependencies()
+
+http_archive(
+    name = "aspect_bazel_lib",
+    sha256 = "09b51a9957adc56c905a2c980d6eb06f04beb1d85c665b467f659871403cf423",
+    strip_prefix = "bazel-lib-1.34.5",
+    url = "https://github.com/aspect-build/bazel-lib/releases/download/v1.34.5/bazel-lib-v1.34.5.tar.gz",
+)
+
+load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
+
+aspect_bazel_lib_dependencies()
