@@ -5,13 +5,13 @@ load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 pkg_files(
     name = "clang_lib_headers",
     srcs = glob(["clang/lib/Headers/**/*"]),
-    strip_prefix = strip_prefix.from_pkg(),
+    strip_prefix = "clang/lib/Headers",
     prefix = "lib/clang/17.0.1/include",
 )
 
 pkg_files(
     name = "libcxx_include",
     srcs = glob(["libcxx/include/**"]),
-    strip_prefix = strip_prefix.from_pkg(),
+    strip_prefix = "libcxx/include",
     prefix = "include/c++/v1",
 )
