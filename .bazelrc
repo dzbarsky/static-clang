@@ -11,8 +11,8 @@ build --remote_executor=grpcs://remote.buildbuddy.io
 build --jobs=500
 
 
-build --extra_execution_platforms=@rbe_default//config:platform
-build --host_platform=@rbe_default//config:platform
+build --extra_execution_platforms=//rbe_platform
+build --host_platform=//rbe_platform
 
 build --extra_toolchains @zig_sdk//toolchain:linux_amd64_musl
 build --extra_toolchains @zig_sdk//libc_aware/toolchain:linux_arm64_musl

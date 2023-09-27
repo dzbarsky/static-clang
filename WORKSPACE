@@ -75,10 +75,6 @@ maybe(
 )
 ## END LLVM ##
 
-local_repository(
-    name = "rbe_default",
-    path = "configs/rbe_default",
-)
 
 ## ZIG CC ##
 HERMETIC_CC_TOOLCHAIN_VERSION = "v2.1.2"
