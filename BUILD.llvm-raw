@@ -1,24 +1,17 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
-
-clang_lib_headers_files = glob(["clang/lib/Headers/**/*"])
+load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 
 pkg_files(
     name = "clang_lib_headers",
-    srcs = clang_lib_headers_files,
-    # Needed to avoid name collisions, see 
-    # https://bazelbuild.slack.com/archives/CD42R4HJL/p1695760404382009
-    renames = {f: f for f in clang_lib_headers_files},
+    srcs = glob(["clang/lib/Headers/**/*"]),
+    strip_prefix = strip_prefix.from_pkg(),
     prefix = "lib/clang/17.0.1/include",
 )
 
-
-libcxx_include_files = glob(["libcxx/include/**"])
-
 pkg_files(
     name = "libcxx_include",
-    srcs = libcxx_include_files,
-    renames = {f: f for f in libcxx_include_files},
+    srcs = glob(["libcxx/include/**"]),
+    strip_prefix = strip_prefix.from_pkg(),
     prefix = "include/c++/v1",
 )

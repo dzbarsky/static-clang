@@ -1,0 +1,26 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Bazel
+        uses: bazelbuild/setup-bazelisk@v2
+
+      - name: Build
+        run: .github/workflows/build_release.sh
+        with:
+          BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./*.tar.xz
