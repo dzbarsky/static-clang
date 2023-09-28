@@ -48,18 +48,11 @@ pkg_tar(
     ],
 )
 
-PLATFORMS = [
-    "@zig_sdk//platform:darwin_amd64",
-    "@zig_sdk//platform:darwin_arm64",
-    "@zig_sdk//libc_aware/platform:linux_arm64_musl",
-    "@zig_sdk//libc_aware/platform:linux_amd64_musl",
-]
-
 pkg_tar(
     name = "dist",
     extension = ".tar.xz",
     srcs = [
-	"@llvm-raw//:clang_lib_headers",
+	"@llvm-project//clang:builtin_headers_pkg_files",
     	"@llvm-raw//:libcxx_include",
     ],
     deps = [
@@ -68,6 +61,13 @@ pkg_tar(
         ":llvm_bins",
     ],
 )
+
+PLATFORMS = [
+    "@zig_sdk//platform:darwin_amd64",
+    "@zig_sdk//platform:darwin_arm64",
+    "@zig_sdk//libc_aware/platform:linux_arm64_musl",
+    "@zig_sdk//libc_aware/platform:linux_amd64_musl",
+]
 
 [
     platform_transition_filegroup(

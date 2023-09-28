@@ -28,13 +28,6 @@ genrule(
 # See https://github.com/llvm/llvm-project/blob/9eeb0293e27c0f1b44304fd9681dcd88fd9edc0a/llvm/utils/gn/secondary/libcxx/include/BUILD.gn#L62-L72
 
 pkg_files(
-    name = "clang_lib_headers",
-    srcs = glob(["clang/lib/Headers/**/*"], exclude = ["**/*.txt"]),
-    strip_prefix = "clang/lib/Headers",
-    prefix = "lib/clang/17/include",
-)
-
-pkg_files(
     name = "libcxx_include",
     srcs = glob(["libcxx/include/**"], exclude = [
         "libcxx/include/CMakeLists.txt",
