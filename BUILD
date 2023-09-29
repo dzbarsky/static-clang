@@ -48,11 +48,20 @@ pkg_tar(
     ],
 )
 
+pkg_files(
+    name = "builtin_headers_pkg_files",
+    srcs = [
+        "@llvm-project//clang:builtin_headers_files",
+    ],
+    strip_prefix = "lib/Headers",
+    prefix = "lib/clang/17/include",
+)
+
 pkg_tar(
     name = "dist",
     extension = ".tar.xz",
     srcs = [
-	"@llvm-project//clang:builtin_headers_pkg_files",
+	"//:builtin_headers_pkg_files",
     	"@llvm-raw//:libcxx_include",
     ],
     deps = [

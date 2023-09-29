@@ -1,26 +1,15 @@
 diff --git a/utils/bazel/llvm-project-overlay/clang/BUILD.bazel b/utils/bazel/llvm-project-overlay/clang/BUILD.bazel
-index 037719a51dd1..13200fd168d0 100644
+index 037719a51dd1..373f24408bd6 100644
 --- a/utils/bazel/llvm-project-overlay/clang/BUILD.bazel
 +++ b/utils/bazel/llvm-project-overlay/clang/BUILD.bazel
-@@ -3,6 +3,7 @@
- # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
- 
- load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
-+load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
- load("//:workspace_root.bzl", "workspace_root")
- load("//llvm:tblgen.bzl", "gentbl")
- load("//llvm:binary_alias.bzl", "binary_alias")
-@@ -1685,6 +1686,14 @@ builtin_headers = glob(
+@@ -1685,6 +1685,11 @@ builtin_headers = glob(
      "lib/Headers/openmp_wrappers/new",
  ]
  
-+pkg_files(
-+    name = "builtin_headers_pkg_files",
++filegroup(
++    name = "builtin_headers_files",
 +    srcs = builtin_headers,
-+    strip_prefix = "lib/Headers",
-+    prefix = "lib/clang/17/include",
 +)
-+
 +
  genrule(
      name = "builtin_headers_gen",
