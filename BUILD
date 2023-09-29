@@ -1,4 +1,5 @@
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@llvm-project//:vars.bzl", "LLVM_VERSION_MAJOR")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
@@ -54,7 +55,7 @@ pkg_files(
         "@llvm-project//clang:builtin_headers_files",
     ],
     strip_prefix = "lib/Headers",
-    prefix = "lib/clang/17/include",
+    prefix = "lib/clang/%s/include" % LLVM_VERSION_MAJOR,
 )
 
 pkg_tar(
