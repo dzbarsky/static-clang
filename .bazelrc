@@ -1,5 +1,6 @@
 build --dynamic_mode=off
-build --force_pic
+# Upstream builds PIE, but it doesn't have much benefit when fully statically linked.
+#build --force_pic
 
 build --bes_results_url=https://app.buildbuddy.io/invocation/
 build --bes_backend=grpcs://remote.buildbuddy.io
@@ -9,7 +10,6 @@ build --nobuild_runfile_links
 build --remote_timeout=3600
 build --remote_executor=grpcs://remote.buildbuddy.io
 build --jobs=500
-
 
 build --extra_execution_platforms=//rbe_platform
 build --host_platform=//rbe_platform
@@ -24,7 +24,13 @@ build --experimental_platform_in_output_dir
 
 build --incompatible_enable_cc_toolchain_resolution
 build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
-build --incompatible_strict_action_env=true
+build --host_action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
+build --incompatible_strict_action_env
+
+# ThinLTO feature by itself doesn't seem to do anything?
+#build --features=thin_lto
+#build --copt -flto=thin
+#build --linkopt -flto=thin
 
 # Compilation Flags
 build -c opt
