@@ -1,5 +1,6 @@
 set -eux
 
+env
 bazel build --remote_header=x-buildbuddy-api-key="$BUILDBUDDY_API_KEY" //:for_all_platforms
 
 mv bazel-out/darwin_amd64-opt-ST-4e8d1fe9d83a/bin/dist.tar.xz darwin_amd64.tar.xz

@@ -23,9 +23,12 @@ build --platforms @zig_sdk//libc_aware/platform:linux_x86_64_musl
 build --experimental_platform_in_output_dir
 
 build --incompatible_enable_cc_toolchain_resolution
+build --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --host_action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --incompatible_strict_action_env
+
+build --action_env=CACHE_BUST=wxyz
 
 build --features=thin_lto
 # ThinLTO feature doesn't exist in Zig toolchain, so we must set the flags manually.

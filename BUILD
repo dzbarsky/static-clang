@@ -16,7 +16,7 @@ pkg_files(
 TIER2_BINS = [
     "llvm-cov",
     "llvm-dwp",
-    "llvm-objdump",
+    #"llvm-objdump",
     "llvm-profdata",
 ]
 

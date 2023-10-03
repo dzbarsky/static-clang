@@ -1,9 +1,6 @@
 name: release
 
-on:
-  push:
-    tags:
-      - "v*.*.*"
+on: [push]
 
 jobs:
   release:
@@ -20,9 +17,9 @@ jobs:
         env:
           BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./*.tar.xz
-            SHA256.txt
+            #- name: Release
+            #  uses: softprops/action-gh-release@v1
+            #  with:
+            #    files: |
+            #      ./*.tar.xz
+            #      SHA256.txt
