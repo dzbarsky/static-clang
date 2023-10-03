@@ -16,7 +16,6 @@ http_archive(
     ],
 )
 
-# See also version in BUILD file (`clang_lib_headers`)
 LLVM_COMMIT = "e19b7dc36bc047b9eb72078d034596be766da350" # 17.0.1
 LLVM_SHA256 = "17b66c0cf44db4869e2193c61503a0c86f3e903bb907995db3d09e2bc77ccbde"
 
