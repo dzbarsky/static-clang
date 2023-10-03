@@ -38,3 +38,15 @@ index b15ec9e1bb39..234723935c2c 100644
      "HAVE_SBRK=1",
      "HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC=1",
  ]
+diff --git a/utils/bazel/llvm-project-overlay/mlir/tblgen.bzl b/utils/bazel/llvm-project-overlay/mlir/tblgen.bzl
+index 9d26822ac163..bacaa93ba7c3 100644
+--- a/utils/bazel/llvm-project-overlay/mlir/tblgen.bzl
++++ b/utils/bazel/llvm-project-overlay/mlir/tblgen.bzl
+@@ -172,7 +172,6 @@ def _gentbl_rule_impl(ctx):
+         # Make sure action_env settings are honored so the env is the same as
+         # when the tool was built. Important for locating shared libraries with
+         # a custom LD_LIBRARY_PATH.
+-        use_default_shell_env = True,
+         mnemonic = "TdGenerate",
+     )
+
