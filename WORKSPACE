@@ -16,8 +16,8 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "e19b7dc36bc047b9eb72078d034596be766da350" # 17.0.1
-LLVM_SHA256 = "17b66c0cf44db4869e2193c61503a0c86f3e903bb907995db3d09e2bc77ccbde"
+LLVM_COMMIT = "b2417f51dbbd7435eb3aaf203de24de6754da50e" # 17.0.2
+LLVM_SHA256 = "1de75288c3f53573c6e3a8fd4168918f19cf7babb5df2e7285e62e9344691837"
 
 http_archive(
     name = "llvm-raw",
@@ -85,8 +85,10 @@ http_archive(
         "https://mirror.bazel.build/github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
         "https://github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
     ],
-    patch_args = ["-p1"],
-    patches = ["//:zig_cc.patch"],
+    # These patches enable ThinLTO. It probably makes the tools faster but they do become a little larger
+    # and the compilation slows down considerably. Reassess if we want this in the future.
+    #patch_args = ["-p1"],
+    #patches = ["//:zig_cc.patch"],
 )
 
 load("@hermetic_cc_toolchain//toolchain:defs.bzl", zig_toolchains = "toolchains")
