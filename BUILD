@@ -4,19 +4,6 @@ load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files")
 
 pkg_files(
-    name = "bins",
-    srcs = [
-        "@llvm-project//clang",
-        "@llvm-project//lld",
-        "@llvm-project//llvm:llvm-ar",
-        "@llvm-project//llvm:llvm-as",
-        "@llvm-project//llvm:llvm-nm",
-        "@llvm-project//llvm:llvm-objcopy",
-    ],
-    prefix = "bin",
-)
-
-pkg_files(
     name = "builtin_headers_pkg_files",
     srcs = [
         "@llvm-project//clang:builtin_headers_files",
@@ -25,27 +12,58 @@ pkg_files(
     strip_prefix = "lib/Headers",
 )
 
-pkg_tar(
-    name = "dist",
-    srcs = [
-        ":bins",
-        "//:builtin_headers_pkg_files",
-        "@llvm-raw//:libcxx_include",
-    ],
-    empty_files = [
-        "bin/llvm-cov",
-        "bin/llvm-dwp",
-        "bin/llvm-objdump",
-        "bin/llvm-profdata",
-    ],
-    symlinks = {
-        "bin/clang++": "./clang",
-        "bin/clang-cpp": "./clang",
-        "bin/ld.lld": "./lld",
-        "bin/llvm-strip": "./llvm-objcopy",
+# These are no needed for a minimal distribution.
+TIER2_BINS = [
+    "llvm-cov",
+    "llvm-dwp",
+    "llvm-objdump",
+    "llvm-profdata",
+]
+
+DIST_FLAVORS = {
+    "_minimal": {
+        "extra_empty_files": ["bin/" + bin for bin in TIER2_BINS],
     },
-    #extension = ".tar.xz",
-)
+    "": {
+        "extra_bins": ["@llvm-project//llvm:" + bin for bin in TIER2_BINS],
+    },
+}
+
+[
+    pkg_files(
+        name = "bins" + suffix,
+        srcs = [
+            "@llvm-project//clang",
+            "@llvm-project//lld",
+            "@llvm-project//llvm:llvm-ar",
+            "@llvm-project//llvm:llvm-as",
+            "@llvm-project//llvm:llvm-nm",
+            "@llvm-project//llvm:llvm-objcopy",
+        ] + props.get("extra_binaries", []),
+        prefix = "bin",
+    )
+    for (suffix, props) in DIST_FLAVORS.items()
+]
+
+[
+    pkg_tar(
+        name = "dist" + suffix,
+        srcs = [
+            ":bins" + suffix,
+            "//:builtin_headers_pkg_files",
+            "@llvm-raw//:libcxx_include",
+        ],
+        empty_files = props.get("extra_empty_files", []),
+        extension = ".tar.xz",
+        symlinks = {
+            "bin/clang++": "./clang",
+            "bin/clang-cpp": "./clang",
+            "bin/ld.lld": "./lld",
+            "bin/llvm-strip": "./llvm-objcopy",
+        },
+    )
+    for (suffix, props) in DIST_FLAVORS.items()
+]
 
 PLATFORMS = [
     "@zig_sdk//platform:darwin_amd64",
@@ -57,7 +75,10 @@ PLATFORMS = [
 [
     platform_transition_filegroup(
         name = "for_" + platform.split(":")[1],
-        srcs = [":dist"],
+        srcs = [
+            ":dist",
+            ":dist_minimal",
+        ],
         target_platform = platform,
     )
     for platform in PLATFORMS
