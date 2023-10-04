@@ -13,3 +13,5 @@ mv bazel-out/linux_arm64_musl-opt-ST-f0306bd6469b/bin/dist_minimal.tar.xz linux_
 
 mv bazel-out/linux_amd64_musl-opt-ST-83633c55e68c/bin/dist.tar.xz linux_amd64.tar.xz
 mv bazel-out/linux_amd64_musl-opt-ST-83633c55e68c/bin/dist_minimal.tar.xz linux_amd64_minimal.tar.xz
+
+shasum -a 256 *tar.xz > SHA256.txt
