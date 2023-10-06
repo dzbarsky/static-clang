@@ -11,22 +11,23 @@ http_archive(
     name = "bazel_skylib",
     sha256 = "74d544d96f4a5bb630d465ca8bbcfe231e3594e5aae57e1edbf17a6eb3ca2506",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/{version}/bazel-skylib-{version}.tar.gz".format(version=SKYLIB_VERSION),
-        "https://github.com/bazelbuild/bazel-skylib/releases/download/{version}/bazel-skylib-{version}.tar.gz".format(version=SKYLIB_VERSION),
+        "https://mirror.bazel.build/github.com/bazelbuild/bazel-skylib/releases/download/{version}/bazel-skylib-{version}.tar.gz".format(version = SKYLIB_VERSION),
+        "https://github.com/bazelbuild/bazel-skylib/releases/download/{version}/bazel-skylib-{version}.tar.gz".format(version = SKYLIB_VERSION),
     ],
 )
 
-LLVM_COMMIT = "b2417f51dbbd7435eb3aaf203de24de6754da50e" # 17.0.2
+LLVM_COMMIT = "b2417f51dbbd7435eb3aaf203de24de6754da50e"  # 17.0.2
+
 LLVM_SHA256 = "1de75288c3f53573c6e3a8fd4168918f19cf7babb5df2e7285e62e9344691837"
 
 http_archive(
     name = "llvm-raw",
     build_file = "//:BUILD.llvm-raw",
+    patch_args = ["-p1"],
+    patches = ["//:llvm.patch"],
     sha256 = LLVM_SHA256,
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
-    patch_args = ["-p1"],
-    patches = ["//:llvm.patch"],
 )
 
 load("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
@@ -69,26 +70,27 @@ maybe(
     sha256 = "7c42d56fac126929a6a85dbc73ff1db2411d04f104fae9bdea51305663a83fd0",
     strip_prefix = "zstd-1.5.2",
     urls = [
-        "https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz"
+        "https://github.com/facebook/zstd/releases/download/v1.5.2/zstd-1.5.2.tar.gz",
     ],
 )
 ## END LLVM ##
-
 
 ## ZIG CC ##
 HERMETIC_CC_TOOLCHAIN_VERSION = "v2.1.2"
 
 http_archive(
     name = "hermetic_cc_toolchain",
+    # These patches enable ThinLTO. It probably makes the tools faster but they do become a little larger
+    # and the compilation slows down considerably. Reassess if we want this in the future.
+    #patch_args = ["-p1"],
+    #patches = ["//:zig_cc.patch"],
+    patch_args = ["-p1"],
+    patches = ["//:zig_fstrip.patch"],
     sha256 = "28fc71b9b3191c312ee83faa1dc65b38eb70c3a57740368f7e7c7a49bedf3106",
     urls = [
         "https://mirror.bazel.build/github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
         "https://github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
     ],
-    # These patches enable ThinLTO. It probably makes the tools faster but they do become a little larger
-    # and the compilation slows down considerably. Reassess if we want this in the future.
-    #patch_args = ["-p1"],
-    #patches = ["//:zig_cc.patch"],
 )
 
 load("@hermetic_cc_toolchain//toolchain:defs.bzl", zig_toolchains = "toolchains")
@@ -102,13 +104,15 @@ zig_toolchains()
 
 http_archive(
     name = "rules_pkg",
+    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
     urls = [
         "https://mirror.bazel.build/github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
         "https://github.com/bazelbuild/rules_pkg/releases/download/0.9.1/rules_pkg-0.9.1.tar.gz",
     ],
-    sha256 = "8f9ee2dc10c1ae514ee599a8b42ed99fa262b757058f65ad3c384289ff70c4b8",
 )
+
 load("@rules_pkg//:deps.bzl", "rules_pkg_dependencies")
+
 rules_pkg_dependencies()
 
 http_archive(
