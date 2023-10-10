@@ -13,6 +13,8 @@ pkg_files(
 )
 
 # These are no needed for a minimal distribution.
+# TODO(zbarsky): We don't really need to build minimal distribution, the compressed size it the same.
+# Keeping this support for now since it will be useful when building additional tools outside the core distribution like clang-tidy, etc.
 TIER2_BINS = [
     "llvm-cov",
     "llvm-dwp",
@@ -77,7 +79,8 @@ PLATFORMS = [
         name = "for_" + platform.split(":")[1],
         srcs = [
             ":dist",
-            ":dist_minimal",
+	    # The minimal dist is the same size compressed as the normal one.
+	    # ":dist_minimal",
         ],
         target_platform = platform,
     )

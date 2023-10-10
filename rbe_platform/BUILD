@@ -9,7 +9,9 @@ platform(
         "@bazel_tools//tools/cpp:clang",
     ],
     exec_properties = {
-        "container-image": "docker://l.gcr.io/google/rbe-ubuntu16-04@sha256:f6568d8168b14aafd1b707019927a63c2d37113a03bcee188218f99bd0327ea1",
+        # Buildbuddy guarantees they pre-cache this image.
+        "container-image": "docker://gcr.io/flame-public/executor-docker-default:latest",
+        #"container-image": "docker://l.gcr.io/google/rbe-ubuntu16-04@sha256:f6568d8168b14aafd1b707019927a63c2d37113a03bcee188218f99bd0327ea1",
         "OSFamily": "Linux",
     },
 )
