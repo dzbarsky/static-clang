@@ -16,9 +16,9 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "b2417f51dbbd7435eb3aaf203de24de6754da50e"  # 17.0.2
+LLVM_COMMIT = "888437e1b60011b8a375dd30928ec925b448da57"  # 17.0.3
 
-LLVM_SHA256 = "1de75288c3f53573c6e3a8fd4168918f19cf7babb5df2e7285e62e9344691837"
+LLVM_SHA256 = "7a118101891964893a34796aa00489c5c8fb3bb15a1427d51bc5017842675648"
 
 http_archive(
     name = "llvm-raw",
@@ -125,4 +125,3 @@ http_archive(
 load("@aspect_bazel_lib//lib:repositories.bzl", "aspect_bazel_lib_dependencies")
 
 aspect_bazel_lib_dependencies()
-
