@@ -41,7 +41,7 @@ DIST_FLAVORS = {
             "@llvm-project//llvm:llvm-as",
             "@llvm-project//llvm:llvm-nm",
             "@llvm-project//llvm:llvm-objcopy",
-        ] + props.get("extra_binaries", []),
+        ] + props.get("extra_bins", []),
         prefix = "bin",
     )
     for (suffix, props) in DIST_FLAVORS.items()
@@ -79,8 +79,8 @@ PLATFORMS = [
         name = "for_" + platform.split(":")[1],
         srcs = [
             ":dist",
-	    # The minimal dist is the same size compressed as the normal one.
-	    # ":dist_minimal",
+            # The minimal dist is the same size compressed as the normal one.
+            # ":dist_minimal",
         ],
         target_platform = platform,
     )
