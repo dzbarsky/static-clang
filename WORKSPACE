@@ -16,9 +16,9 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "888437e1b60011b8a375dd30928ec925b448da57"  # 17.0.3
+LLVM_COMMIT = "309d55140c46384b6de7a7573206cbeba3f7077f"  # 17.0.4
 
-LLVM_SHA256 = "7a118101891964893a34796aa00489c5c8fb3bb15a1427d51bc5017842675648"
+LLVM_SHA256 = "a24528bc46fb436cb5aa949ef38e0c90d60dbd88c22e7bd9c6d7020c789e28b0"
 
 http_archive(
     name = "llvm-raw",
@@ -76,7 +76,7 @@ maybe(
 ## END LLVM ##
 
 ## ZIG CC ##
-HERMETIC_CC_TOOLCHAIN_VERSION = "v2.1.2"
+HERMETIC_CC_TOOLCHAIN_VERSION = "v2.1.3"
 
 http_archive(
     name = "hermetic_cc_toolchain",
@@ -84,9 +84,7 @@ http_archive(
     # and the compilation slows down considerably. Reassess if we want this in the future.
     #patch_args = ["-p1"],
     #patches = ["//:zig_cc.patch"],
-    patch_args = ["-p1"],
-    patches = ["//:zig_fstrip.patch"],
-    sha256 = "28fc71b9b3191c312ee83faa1dc65b38eb70c3a57740368f7e7c7a49bedf3106",
+    sha256 = "a5caccbf6d86d4f60afd45b541a05ca4cc3f5f523aec7d3f7711e584600fb075",
     urls = [
         "https://mirror.bazel.build/github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
         "https://github.com/uber/hermetic_cc_toolchain/releases/download/{0}/hermetic_cc_toolchain-{0}.tar.gz".format(HERMETIC_CC_TOOLCHAIN_VERSION),
