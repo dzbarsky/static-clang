@@ -14,12 +14,7 @@ build --jobs=500
 build --extra_execution_platforms=//rbe_platform
 build --host_platform=//rbe_platform
 
-build --extra_toolchains @zig_sdk//toolchain:linux_amd64_musl
-build --extra_toolchains @zig_sdk//libc_aware/toolchain:linux_arm64_musl
-build --extra_toolchains @zig_sdk//libc_aware/toolchain:linux_amd64_musl
-build --extra_toolchains @zig_sdk//toolchain:darwin_amd64
-build --extra_toolchains @zig_sdk//toolchain:darwin_arm64
-build --platforms @zig_sdk//libc_aware/platform:linux_x86_64_musl
+build --platforms @zig_sdk//libc_aware/platform:linux_amd64_musl
 build --experimental_platform_in_output_dir
 
 build --incompatible_enable_cc_toolchain_resolution
@@ -28,6 +23,8 @@ build --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --host_action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 build --incompatible_strict_action_env
 
+# TODO(zbarsky): This doesn't build due to "zlib.h" vs <zlib.h> usage.
+build --@llvm_zlib//:llvm_enable_zlib=false
 build --experimental_merged_skyframe_analysis_execution
 
 build --features=thin_lto
