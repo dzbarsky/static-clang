@@ -36,6 +36,7 @@ DIST_FLAVORS = {
             "@llvm-project//lld",
             "@llvm-project//llvm:llvm-ar",
             "@llvm-project//llvm:llvm-as",
+            "@llvm-project//llvm:llvm-libtool-darwin",
             "@llvm-project//llvm:llvm-nm",
             "@llvm-project//llvm:llvm-objcopy",
         ] + props.get("extra_bins", []),
