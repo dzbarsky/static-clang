@@ -1,0 +1,2865 @@
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/BUILD.bazel
+new file mode 100644
+index 000000000000..1bb8bf6d7fd4
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/BUILD.bazel
+@@ -0,0 +1 @@
++# empty
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/asan/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/asan/BUILD.bazel
+new file mode 100644
+index 000000000000..facd76a0641f
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/asan/BUILD.bazel
+@@ -0,0 +1,245 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "asan_headers",
++    srcs = [
++        "asan_activation.h",
++        "asan_activation_flags.inc",
++        "asan_allocator.h",
++        "asan_descriptions.h",
++        "asan_errors.h",
++        "asan_fake_stack.h",
++        "asan_flags.h",
++        "asan_flags.inc",
++        "asan_init_version.h",
++        "asan_interceptors.h",
++        "asan_interceptors_memintrinsics.h",
++        "asan_interface.inc",
++        "asan_interface_internal.h",
++        "asan_internal.h",
++        "asan_lock.h",
++        "asan_mapping.h",
++        "asan_poisoning.h",
++        "asan_premap_shadow.h",
++        "asan_report.h",
++        "asan_scariness_score.h",
++        "asan_stack.h",
++        "asan_stats.h",
++        "asan_suppressions.h",
++        "asan_thread.h",
++    ],
++)
++
++filegroup(
++    name = "asan_sources",
++    srcs = [
++        "asan_activation.cpp",
++        "asan_allocator.cpp",
++        "asan_debugging.cpp",
++        "asan_descriptions.cpp",
++        "asan_errors.cpp",
++        "asan_fake_stack.cpp",
++        "asan_flags.cpp",
++        "asan_fuchsia.cpp",
++        "asan_globals.cpp",
++        "asan_globals_win.cpp",
++        "asan_interceptors.cpp",
++        "asan_interceptors_memintrinsics.cpp",
++        "asan_interceptors_vfork.S",  # Not Win32 and not Apple.
++        "asan_linux.cpp",
++        "asan_mac.cpp",
++        "asan_malloc_linux.cpp",
++        "asan_malloc_mac.cpp",
++        "asan_malloc_win.cpp",
++        "asan_memory_profile.cpp",
++        "asan_poisoning.cpp",
++        "asan_posix.cpp",
++        "asan_premap_shadow.cpp",
++        "asan_report.cpp",
++        "asan_rtl.cpp",
++        "asan_shadow_setup.cpp",
++        "asan_stack.cpp",
++        "asan_stats.cpp",
++        "asan_suppressions.cpp",
++        "asan_thread.cpp",
++        "asan_win.cpp",
++    ],
++)
++
++filegroup(
++    name = "asan_cxx_sources",
++    srcs = [
++        "asan_new_delete.cpp",
++    ],
++)
++
++filegroup(
++    name = "asan_static_sources",
++    srcs = [
++        "asan_rtl_static.cpp",
++        "asan_rtl_x86_64.S",  # Not Win32 and not Apple.
++    ],
++)
++
++filegroup(
++    name = "asan_preinit_sources",
++    srcs = [
++        "asan_preinit.cpp",
++    ],
++)
++
++ll_library(
++    name = "RTAsan_dynamic",
++    srcs = [
++        ":asan_cxx_sources",
++        ":asan_sources",
++    ],
++    hdrs = [
++        ":asan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/lsan:lsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-fvisibility=hidden",
++    ],
++    defines = ["ASAN_DYNAMIC=1"],
++    emit = ["objects"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTAsan",
++    srcs = [
++        ":asan_sources",
++    ],
++    hdrs = [
++        ":asan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/lsan:lsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    compilation_mode = "bootstrap",
++    emit = ["objects"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTAsan_cxx",
++    srcs = [
++        ":asan_cxx_sources",
++    ],
++    hdrs = [
++        ":asan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    emit = ["objects"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTAsan_static",
++    srcs = [
++        "asan_rtl_static.cpp",
++        "asan_rtl_x86_64.S",  # Not Win32 and not Apple.
++    ],
++    hdrs = [
++        ":asan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    emit = ["objects"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTAsan_preinit",
++    srcs = [
++        ":asan_preinit_sources",
++    ],
++    hdrs = [
++        ":asan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    emit = ["objects"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "clang_rt.asan",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTAsan",
++        ":RTAsan_preinit",
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/lsan:RTLSanCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++        "//compiler-rt/lib/ubsan:RTUbsan",
++    ],
++)
++
++ll_library(
++    # We want the output library to be named libasan.so. Otherwise it will not
++    # be recognized by IsDynamicRTName in asan_linux.cpp.
++    name = "libasan",
++    compilation_mode = "bootstrap",
++    emit = ["shared_object"],
++    shared_object_link_flags = [
++        "--eh-frame-hdr",
++    ],
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTAsan_dynamic",
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/lsan:RTLSanCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++        "//compiler-rt/lib/ubsan:RTUbsan",
++        "//compiler-rt/lib/ubsan:RTUbsan_cxx",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.asan_cxx",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTAsan_cxx",
++        "//compiler-rt/lib/ubsan:RTUbsan_cxx",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.asan_static",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTAsan_static",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.asan-preinit",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTAsan_preinit",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/builtins/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/builtins/BUILD.bazel
+new file mode 100644
+index 000000000000..a9907f6e21f4
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/builtins/BUILD.bazel
+@@ -0,0 +1,252 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++GENERIC_SOURCES = [
++    "absvdi2.c",
++    "absvsi2.c",
++    "absvti2.c",
++    "adddf3.c",
++    "addsf3.c",
++    "addvdi3.c",
++    "addvsi3.c",
++    "addvti3.c",
++    "apple_versioning.c",
++    "ashldi3.c",
++    "ashlti3.c",
++    "ashrdi3.c",
++    "ashrti3.c",
++    "bswapdi2.c",
++    "bswapsi2.c",
++    "clzdi2.c",
++    "clzsi2.c",
++    "clzti2.c",
++    "cmpdi2.c",
++    "cmpti2.c",
++    "comparedf2.c",
++    "comparesf2.c",
++    "ctzdi2.c",
++    "ctzsi2.c",
++    "ctzti2.c",
++    "divdc3.c",
++    "divdf3.c",
++    "divdi3.c",
++    "divmoddi4.c",
++    "divmodsi4.c",
++    "divmodti4.c",
++    "divsc3.c",
++    "divsf3.c",
++    "divsi3.c",
++    "divti3.c",
++    "extendsfdf2.c",
++    "extendhfsf2.c",
++    "ffsdi2.c",
++    "ffssi2.c",
++    "ffsti2.c",
++    "fixdfdi.c",
++    "fixdfsi.c",
++    "fixdfti.c",
++    "fixsfdi.c",
++    "fixsfsi.c",
++    "fixsfti.c",
++    "fixunsdfdi.c",
++    "fixunsdfsi.c",
++    "fixunsdfti.c",
++    "fixunssfdi.c",
++    "fixunssfsi.c",
++    "fixunssfti.c",
++    "floatdidf.c",
++    "floatdisf.c",
++    "floatsidf.c",
++    "floatsisf.c",
++    "floattidf.c",
++    "floattisf.c",
++    "floatundidf.c",
++    "floatundisf.c",
++    "floatunsidf.c",
++    "floatunsisf.c",
++    "floatuntidf.c",
++    "floatuntisf.c",
++    "fp_mode.c",
++    "int_util.c",
++    "lshrdi3.c",
++    "lshrti3.c",
++    "moddi3.c",
++    "modsi3.c",
++    "modti3.c",
++    "muldc3.c",
++    "muldf3.c",
++    "muldi3.c",
++    "mulodi4.c",
++    "mulosi4.c",
++    "muloti4.c",
++    "mulsc3.c",
++    "mulsf3.c",
++    "multi3.c",
++    "mulvdi3.c",
++    "mulvsi3.c",
++    "mulvti3.c",
++    "negdf2.c",
++    "negdi2.c",
++    "negsf2.c",
++    "negti2.c",
++    "negvdi2.c",
++    "negvsi2.c",
++    "negvti2.c",
++    "os_version_check.c",
++    "paritydi2.c",
++    "paritysi2.c",
++    "parityti2.c",
++    "popcountdi2.c",
++    "popcountsi2.c",
++    "popcountti2.c",
++    "powidf2.c",
++    "powisf2.c",
++    "subdf3.c",
++    "subsf3.c",
++    "subvdi3.c",
++    "subvsi3.c",
++    "subvti3.c",
++    "trampoline_setup.c",
++    "truncdfhf2.c",
++    "truncdfsf2.c",
++    "truncsfhf2.c",
++    "ucmpdi2.c",
++    "ucmpti2.c",
++    "udivdi3.c",
++    "udivmoddi4.c",
++    "udivmodsi4.c",
++    "udivmodti4.c",
++    "udivsi3.c",
++    "udivti3.c",
++    "umoddi3.c",
++    "umodsi3.c",
++    "umodti3.c",
++
++    # Not Fuchsia and not a bare-metal build.
++    "emutls.c",
++    "enable_execute_stack.c",
++    "eprintf.c",
++
++    # Not sure whether we want atomic in this or separately.
++    "atomic.c",
++
++    # Not sure whether this is for libunwind or gcc_s. gotta check.
++    "gcc_personality_v0.c",
++
++    # Not Fuchsia.
++    "clear_cache.c",
++]
++
++GENERIC_TF_SOURCES = [
++    "addtf3.c",
++    "comparetf2.c",
++    "divtc3.c",
++    "divtf3.c",
++    "extenddftf2.c",
++    "extendhftf2.c",
++    "extendsftf2.c",
++    "fixtfdi.c",
++    "fixtfsi.c",
++    "fixtfti.c",
++    "fixunstfdi.c",
++    "fixunstfsi.c",
++    "fixunstfti.c",
++    "floatditf.c",
++    "floatsitf.c",
++    "floattitf.c",
++    "floatunditf.c",
++    "floatunsitf.c",
++    "floatuntitf.c",
++    "multc3.c",
++    "multf3.c",
++    "powitf2.c",
++    "subtf3.c",
++    "trunctfdf2.c",
++    "trunctfhf2.c",
++    "trunctfsf2.c",
++]
++
++X86_ARCH_SOURCES = [
++    "cpu_model.c",
++    "i386/fp_mode.c",  # Used on 64-bit as well.
++]
++
++X86_80_BIT_SOURCES = [
++    "divxc3.c",
++    "fixxfdi.c",
++    "fixxfti.c",
++    "fixunsxfdi.c",
++    "fixunsxfsi.c",
++    "fixunsxfti.c",
++    "floatdixf.c",
++    "floattixf.c",
++    "floatundixf.c",
++    "floatuntixf.c",
++    "mulxc3.c",
++    "powixf2.c",
++]
++
++X86_64_SOURCES = GENERIC_SOURCES + GENERIC_TF_SOURCES + X86_ARCH_SOURCES + X86_80_BIT_SOURCES + [
++    "x86_64/floatdidf.c",
++    "x86_64/floatdisf.c",
++    "x86_64/floatundidf.S",
++    "x86_64/floatundisf.S",
++    "x86_64/floatdixf.c",
++    "x86_64/floatundixf.S",
++]
++
++ll_library(
++    name = "builtins",
++    srcs = X86_64_SOURCES,
++    hdrs = [
++        "assembly.h",
++        "fp_add_impl.inc",
++        "fp_compare_impl.inc",
++        "fp_div_impl.inc",
++        "fp_extend.h",
++        "fp_extend_impl.inc",
++        "fp_fixint_impl.inc",
++        "fp_fixuint_impl.inc",
++        "fp_lib.h",
++        "fp_mode.h",
++        "fp_mul_impl.inc",
++        "fp_trunc.h",
++        "fp_trunc_impl.inc",
++        "int_div_impl.inc",
++        "int_endianness.h",
++        "int_lib.h",
++        "int_math.h",
++        "int_mulo_impl.inc",
++        "int_mulv_impl.inc",
++        "int_types.h",
++        "int_util.h",
++    ],
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "crtbegin",
++    srcs = ["crtbegin.c"],
++    compilation_mode = "bootstrap",
++    defines = ["EH_USE_FRAME_REGISTRY"],
++    emit = ["objects"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "crtend",
++    srcs = ["crtend.c"],
++    compilation_mode = "bootstrap",
++    emit = ["objects"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "crt",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":crtbegin",
++        ":crtend",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/interception/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/interception/BUILD.bazel
+new file mode 100644
+index 000000000000..00dc14842c79
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/interception/BUILD.bazel
+@@ -0,0 +1,29 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "interception_headers",
++    srcs = [
++        "interception.h",
++        "interception_linux.h",
++        "interception_mac.h",
++        "interception_win.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTInterception",
++    srcs = [
++        "interception_linux.cpp",
++        "interception_mac.cpp",
++        "interception_type_test.cpp",
++        "interception_win.cpp",
++    ],
++    hdrs = [
++        ":interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/lsan/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/lsan/BUILD.bazel
+new file mode 100644
+index 000000000000..def330e68227
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/lsan/BUILD.bazel
+@@ -0,0 +1,63 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "lsan_headers",
++    srcs = [
++        "lsan.h",
++        "lsan_allocator.h",
++        "lsan_common.h",
++        "lsan_flags.inc",
++        "lsan_posix.h",  # Missing in CMake.
++        "lsan_thread.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTLSanCommon",
++    srcs = [
++        "lsan_common.cpp",
++        "lsan_common_fuchsia.cpp",
++        "lsan_common_linux.cpp",
++        "lsan_common_mac.cpp",
++    ],
++    hdrs = [
++        ":lsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "clang_rt.lsan",
++    srcs = [
++        "lsan.cpp",
++        "lsan_allocator.cpp",
++        "lsan_fuchsia.cpp",
++        "lsan_interceptors.cpp",
++        "lsan_linux.cpp",
++        "lsan_mac.cpp",
++        "lsan_malloc_mac.cpp",
++        "lsan_posix.cpp",
++        "lsan_preinit.cpp",
++        "lsan_thread.cpp",
++    ],
++    hdrs = [
++        ":lsan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTLSanCommon",
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/msan/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/msan/BUILD.bazel
+new file mode 100644
+index 000000000000..c63f7aa83fd1
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/msan/BUILD.bazel
+@@ -0,0 +1,76 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "msan_headers",
++    srcs = [
++        "msan.h",
++        "msan_allocator.h",
++        "msan_chained_origin_depot.h",
++        "msan_dl.h",
++        "msan_flags.h",
++        "msan_flags.inc",
++        "msan_interface_internal.h",
++        "msan_origin.h",
++        "msan_poisoning.h",
++        "msan_report.h",
++        "msan_thread.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "clang_rt.msan",
++    srcs = [
++        "msan.cpp",
++        "msan_allocator.cpp",
++        "msan_chained_origin_depot.cpp",
++        "msan_dl.cpp",
++        "msan_interceptors.cpp",
++        "msan_linux.cpp",
++        "msan_poisoning.cpp",
++        "msan_report.cpp",
++        "msan_thread.cpp",
++    ],
++    hdrs = [
++        ":msan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-ffreestanding",
++    ],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++        "//compiler-rt/lib/ubsan:RTUbsan",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.msan_cxx",
++    srcs = [
++        "msan_new_delete.cpp",
++    ],
++    hdrs = [
++        ":msan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-ffreestanding",
++    ],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        "//compiler-rt/lib/ubsan:RTUbsan_cxx",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/profile/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/profile/BUILD.bazel
+new file mode 100644
+index 000000000000..17c6d2978b11
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/profile/BUILD.bazel
+@@ -0,0 +1,44 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++ll_library(
++    name = "clang_rt.profile",
++    srcs = [
++        "GCDAProfiling.c",
++        "InstrProfiling.c",
++        "InstrProfilingBuffer.c",
++        "InstrProfilingFile.c",
++        "InstrProfilingInternal.c",
++        "InstrProfilingMerge.c",
++        "InstrProfilingMergeFile.c",
++        "InstrProfilingNameVar.c",
++        "InstrProfilingPlatformDarwin.c",
++        "InstrProfilingPlatformFuchsia.c",
++        "InstrProfilingPlatformLinux.c",
++        "InstrProfilingPlatformOther.c",
++        "InstrProfilingPlatformWindows.c",
++        "InstrProfilingRuntime.cpp",
++        "InstrProfilingUtil.c",
++        "InstrProfilingValue.c",
++        "InstrProfilingVersionVar.c",
++        "InstrProfilingWriter.c",
++    ],
++    hdrs = [
++        "InstrProfiling.h",
++        "InstrProfilingInternal.h",
++        "InstrProfilingPort.h",
++        "InstrProfilingUtil.h",
++        "WindowsMMap.h",
++    ],
++    compilation_mode = "bootstrap",
++    defines = [
++        "COMPILER_RT_HAS_UNAME=1",
++        "COMPILER_RT_HAS_FCNTL_LCK=1",
++        "COMPILER_RT_HAS_ATOMICS=1",
++    ],
++    includes = [
++        "compiler-rt/include",
++        "compiler-rt/lib",
++    ],
++    visibility = ["//visibility:public"],
++    deps = ["//compiler-rt:compiler_rt_hdrs"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/sanitizer_common/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/sanitizer_common/BUILD.bazel
+new file mode 100644
+index 000000000000..971706693bb8
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/sanitizer_common/BUILD.bazel
+@@ -0,0 +1,254 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "sanitizer_impl_headers",
++    srcs = [
++        "sancov_flags.h",
++        "sancov_flags.inc",
++        "sanitizer_addrhashmap.h",
++        "sanitizer_allocator.h",
++        "sanitizer_allocator_checks.h",
++        "sanitizer_allocator_combined.h",
++        "sanitizer_allocator_dlsym.h",
++        "sanitizer_allocator_interface.h",
++        "sanitizer_allocator_internal.h",
++        "sanitizer_allocator_local_cache.h",
++        "sanitizer_allocator_primary32.h",
++        "sanitizer_allocator_primary64.h",
++        "sanitizer_allocator_report.h",
++        "sanitizer_allocator_secondary.h",
++        "sanitizer_allocator_size_class_map.h",
++        "sanitizer_allocator_stats.h",
++        "sanitizer_array_ref.h",
++        "sanitizer_asm.h",
++        "sanitizer_atomic.h",
++        "sanitizer_atomic_clang.h",
++        "sanitizer_atomic_clang_mips.h",
++        "sanitizer_atomic_clang_other.h",
++        "sanitizer_atomic_clang_x86.h",
++        "sanitizer_atomic_msvc.h",
++        "sanitizer_bitvector.h",
++        "sanitizer_bvgraph.h",
++        "sanitizer_chained_origin_depot.h",
++        "sanitizer_common.h",
++        "sanitizer_common_interceptors.inc",
++        "sanitizer_common_interceptors_format.inc",
++        "sanitizer_common_interceptors_ioctl.inc",
++        "sanitizer_common_interceptors_memintrinsics.inc",
++        "sanitizer_common_interceptors_netbsd_compat.inc",  # Missing in CMake.
++
++        # Always linux. Missing in CMake.
++        "sanitizer_common_interceptors_vfork_aarch64.inc.S",
++        "sanitizer_common_interceptors_vfork_arm.inc.S",
++        "sanitizer_common_interceptors_vfork_i386.inc.S",
++        "sanitizer_common_interceptors_vfork_loongarch64.inc.S",
++        "sanitizer_common_interceptors_vfork_riscv64.inc.S",
++        "sanitizer_common_interceptors_vfork_x86_64.inc.S",
++        "sanitizer_common_interface.inc",
++        "sanitizer_common_interface_posix.inc",
++        "sanitizer_common_syscalls.inc",
++        "sanitizer_coverage_interface.inc",
++        "sanitizer_dbghelp.h",
++        "sanitizer_deadlock_detector.h",
++        "sanitizer_deadlock_detector_interface.h",
++        "sanitizer_dense_map.h",
++        "sanitizer_dense_map_info.h",
++        "sanitizer_errno.h",
++        "sanitizer_errno_codes.h",
++        "sanitizer_file.h",
++        "sanitizer_flag_parser.h",
++        "sanitizer_flags.h",
++        "sanitizer_flags.inc",
++        "sanitizer_flat_map.h",
++        "sanitizer_freebsd.h",
++        "sanitizer_fuchsia.h",
++        "sanitizer_getauxval.h",
++        "sanitizer_glibc_version.h",  # Missing in CMake.
++        "sanitizer_hash.h",
++        "sanitizer_interceptors_ioctl_netbsd.inc",
++        "sanitizer_interface_internal.h",
++        "sanitizer_internal_defs.h",
++        "sanitizer_leb128.h",
++        "sanitizer_lfstack.h",
++        "sanitizer_libc.h",
++        "sanitizer_libignore.h",
++        "sanitizer_linux.h",
++        "sanitizer_list.h",
++        "sanitizer_local_address_space_view.h",
++        "sanitizer_lzw.h",
++        "sanitizer_mac.h",
++        "sanitizer_mallinfo.h",
++        "sanitizer_malloc_mac.inc",
++        "sanitizer_mutex.h",
++        "sanitizer_placement_new.h",
++        "sanitizer_platform.h",
++        "sanitizer_platform_interceptors.h",
++        "sanitizer_platform_limits_freebsd.h",  # Missing in CMake.
++        "sanitizer_platform_limits_netbsd.h",
++        "sanitizer_platform_limits_posix.h",
++        "sanitizer_platform_limits_solaris.h",
++        "sanitizer_posix.h",
++        "sanitizer_procmaps.h",
++        "sanitizer_ptrauth.h",
++        "sanitizer_quarantine.h",
++        "sanitizer_range.h",
++        "sanitizer_redefine_builtins.h",
++        "sanitizer_report_decorator.h",
++        "sanitizer_ring_buffer.h",
++        "sanitizer_signal_interceptors.inc",
++        "sanitizer_solaris.h",
++        "sanitizer_stack_store.h",
++        "sanitizer_stackdepot.h",
++        "sanitizer_stackdepotbase.h",
++        "sanitizer_stacktrace.h",
++        "sanitizer_stacktrace_printer.h",
++        "sanitizer_stoptheworld.h",
++        "sanitizer_suppressions.h",
++        "sanitizer_symbolizer.h",
++        "sanitizer_symbolizer_fuchsia.h",
++        "sanitizer_symbolizer_internal.h",
++        "sanitizer_symbolizer_libbacktrace.h",
++        "sanitizer_symbolizer_mac.h",
++        "sanitizer_syscall_generic.inc",
++        "sanitizer_syscall_linux_aarch64.inc",
++        "sanitizer_syscall_linux_arm.inc",
++        "sanitizer_syscall_linux_riscv64.inc",
++        "sanitizer_syscall_linux_x86_64.inc",
++        "sanitizer_syscalls_netbsd.inc",
++        "sanitizer_thread_arg_retval.h",
++        "sanitizer_thread_registry.h",
++        "sanitizer_thread_safety.h",
++        "sanitizer_tls_get_addr.h",
++        "sanitizer_type_traits.h",  # Missing in CMake.
++        "sanitizer_vector.h",
++        "sanitizer_win.h",
++        "sanitizer_win_defs.h",
++        "sanitizer_win_dll_thunk.h",
++        "sanitizer_win_weak_interception.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++# TODO: Architecture-specific names as in CMake.
++ll_library(
++    name = "RTSanitizerCommon",
++    srcs = [
++        "sanitizer_allocator.cpp",
++        "sanitizer_common.cpp",
++        "sanitizer_deadlock_detector1.cpp",
++        "sanitizer_deadlock_detector2.cpp",
++        "sanitizer_errno.cpp",
++        "sanitizer_file.cpp",
++        "sanitizer_flags.cpp",
++        "sanitizer_flag_parser.cpp",
++        "sanitizer_fuchsia.cpp",
++        "sanitizer_libc.cpp",
++        "sanitizer_libignore.cpp",
++        "sanitizer_linux.cpp",
++        "sanitizer_linux_s390.cpp",
++        "sanitizer_mac.cpp",
++        "sanitizer_mutex.cpp",
++        "sanitizer_netbsd.cpp",
++        "sanitizer_platform_limits_freebsd.cpp",
++        "sanitizer_platform_limits_linux.cpp",
++        "sanitizer_platform_limits_netbsd.cpp",
++        "sanitizer_platform_limits_posix.cpp",
++        "sanitizer_platform_limits_solaris.cpp",
++        "sanitizer_posix.cpp",
++        "sanitizer_printf.cpp",
++        "sanitizer_procmaps_common.cpp",
++        "sanitizer_procmaps_bsd.cpp",
++        "sanitizer_procmaps_fuchsia.cpp",
++        "sanitizer_procmaps_linux.cpp",
++        "sanitizer_procmaps_mac.cpp",
++        "sanitizer_procmaps_solaris.cpp",
++        "sanitizer_range.cpp",
++        "sanitizer_solaris.cpp",
++        "sanitizer_stoptheworld_fuchsia.cpp",
++        "sanitizer_stoptheworld_mac.cpp",
++        "sanitizer_stoptheworld_win.cpp",
++        "sanitizer_suppressions.cpp",
++        "sanitizer_tls_get_addr.cpp",
++        "sanitizer_thread_arg_retval.cpp",
++        "sanitizer_thread_registry.cpp",
++        "sanitizer_type_traits.cpp",
++        "sanitizer_win.cpp",
++
++        # Always termination.
++        "sanitizer_termination.cpp",
++    ],
++    hdrs = [":sanitizer_impl_headers"],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTSanitizerCommonNoLibc",
++    srcs = [
++        "sanitizer_common_nolibc.cpp",
++    ],
++    hdrs = [":sanitizer_impl_headers"],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTSanitizerCommonLibc",
++    srcs = [
++        "sanitizer_allocator_checks.cpp",
++        "sanitizer_common_libcdep.cpp",
++        "sanitizer_linux_libcdep.cpp",
++        "sanitizer_mac_libcdep.cpp",
++        "sanitizer_posix_libcdep.cpp",
++        "sanitizer_stoptheworld_linux_libcdep.cpp",
++        "sanitizer_stoptheworld_netbsd_libcdep.cpp",
++    ],
++    hdrs = [":sanitizer_impl_headers"],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTSanitizerCommonCoverage",
++    srcs = [
++        "sancov_flags.cpp",
++        "sanitizer_coverage_fuchsia.cpp",
++        "sanitizer_coverage_libcdep_new.cpp",
++        "sanitizer_coverage_win_sections.cpp",
++    ],
++    hdrs = [":sanitizer_impl_headers"],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTSanitizerCommonSymbolizer",
++    srcs = [
++        "sanitizer_allocator_report.cpp",
++        "sanitizer_chained_origin_depot.cpp",
++        "sanitizer_stack_store.cpp",
++        "sanitizer_stackdepot.cpp",
++        "sanitizer_stacktrace.cpp",
++        "sanitizer_stacktrace_libcdep.cpp",
++        "sanitizer_stacktrace_printer.cpp",
++        "sanitizer_stacktrace_sparc.cpp",
++        "sanitizer_symbolizer.cpp",
++        "sanitizer_symbolizer_libbacktrace.cpp",
++        "sanitizer_symbolizer_libcdep.cpp",
++        "sanitizer_symbolizer_mac.cpp",
++        "sanitizer_symbolizer_markup.cpp",
++        "sanitizer_symbolizer_posix_libcdep.cpp",
++        "sanitizer_symbolizer_report.cpp",
++        "sanitizer_symbolizer_win.cpp",
++        "sanitizer_unwind_linux_libcdep.cpp",
++        "sanitizer_unwind_win.cpp",
++    ],
++    hdrs = [":sanitizer_impl_headers"],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/tsan/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/tsan/BUILD.bazel
+new file mode 100644
+index 000000000000..e52fe9a585ed
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/tsan/BUILD.bazel
+@@ -0,0 +1,115 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "tsan_headers",
++    srcs = [
++        "rtl/tsan_defs.h",
++        "rtl/tsan_dense_alloc.h",
++        "rtl/tsan_fd.h",
++        "rtl/tsan_flags.h",
++        "rtl/tsan_flags.inc",
++        "rtl/tsan_ignoreset.h",
++        "rtl/tsan_ilist.h",
++        "rtl/tsan_interceptors.h",
++        "rtl/tsan_interface.h",
++        "rtl/tsan_interface.inc",
++        "rtl/tsan_interface_ann.h",
++        "rtl/tsan_interface_java.h",
++        "rtl/tsan_mman.h",
++        "rtl/tsan_mutexset.h",
++        "rtl/tsan_platform.h",
++        "rtl/tsan_ppc_regs.h",
++        "rtl/tsan_report.h",
++        "rtl/tsan_rtl.h",
++        "rtl/tsan_shadow.h",
++        "rtl/tsan_stack_trace.h",
++        "rtl/tsan_suppressions.h",
++        "rtl/tsan_symbolize.h",
++        "rtl/tsan_sync.h",
++        "rtl/tsan_trace.h",
++        "rtl/tsan_vector_clock.h",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.tsan",
++    srcs = [
++        # TSAN_SOURCES.
++        "rtl/tsan_debugging.cpp",
++        "rtl/tsan_external.cpp",
++        "rtl/tsan_fd.cpp",
++        "rtl/tsan_flags.cpp",
++        "rtl/tsan_ignoreset.cpp",
++        "rtl/tsan_interceptors_memintrinsics.cpp",
++        "rtl/tsan_interceptors_posix.cpp",
++        "rtl/tsan_interface.cpp",
++        "rtl/tsan_interface_ann.cpp",
++        "rtl/tsan_interface_atomic.cpp",
++        "rtl/tsan_interface_java.cpp",
++        "rtl/tsan_malloc_mac.cpp",
++        "rtl/tsan_md5.cpp",
++        "rtl/tsan_mman.cpp",
++        "rtl/tsan_mutexset.cpp",
++        "rtl/tsan_report.cpp",
++        "rtl/tsan_rtl.cpp",
++        "rtl/tsan_rtl_access.cpp",
++        "rtl/tsan_rtl_mutex.cpp",
++        "rtl/tsan_rtl_proc.cpp",
++        "rtl/tsan_rtl_report.cpp",
++        "rtl/tsan_rtl_thread.cpp",
++        "rtl/tsan_stack_trace.cpp",
++        "rtl/tsan_suppressions.cpp",
++        "rtl/tsan_symbolize.cpp",
++        "rtl/tsan_sync.cpp",
++        "rtl/tsan_vector_clock.cpp",
++
++        # TSAN_ASM_SOURCES.
++        "rtl/tsan_rtl_amd64.S",
++
++        # TSAN_PREINIT_SOURCES.
++        "rtl/tsan_preinit.cpp",
++
++        # Linux sources.
++        "rtl/tsan_platform_linux.cpp",
++        "rtl/tsan_platform_posix.cpp",
++    ],
++    hdrs = [
++        ":tsan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    angled_includes = ["compiler-rt/lib"],
++    compilation_mode = "bootstrap",
++    compile_flags = ["-msse4.2"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++        "//compiler-rt/lib/ubsan:RTUbsan",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.tsan_cxx",
++    srcs = [
++        "rtl/tsan_new_delete.cpp",
++    ],
++    hdrs = [
++        ":tsan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++        "//compiler-rt/lib/ubsan:ubsan_headers",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = ["-msse4.2"],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        "//compiler-rt/lib/ubsan:RTUbsan_cxx",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/lib/ubsan/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/lib/ubsan/BUILD.bazel
+new file mode 100644
+index 000000000000..c7f113f4ff77
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/lib/ubsan/BUILD.bazel
+@@ -0,0 +1,109 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "ubsan_headers",
++    srcs = [
++        "ubsan_checks.inc",
++        "ubsan_diag.h",
++        "ubsan_flags.h",
++        "ubsan_flags.inc",
++        "ubsan_handlers.h",
++        "ubsan_handlers_cxx.h",
++        "ubsan_init.h",
++        "ubsan_interface.inc",
++        "ubsan_monitor.h",
++        "ubsan_platform.h",
++        "ubsan_signals_standalone.h",
++        "ubsan_type_hash.h",
++        "ubsan_value.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTUbsan",
++    srcs = [
++        "ubsan_diag.cpp",
++        "ubsan_flags.cpp",
++        "ubsan_handlers.cpp",
++        "ubsan_init.cpp",
++        "ubsan_monitor.cpp",
++        "ubsan_value.cpp",
++    ],
++    hdrs = [
++        ":ubsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    defines = [
++        "UBSAN_CAN_USE_CXXABI",
++    ],
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTUbsan_cxx",
++    srcs = [
++        "ubsan_handlers_cxx.cpp",
++        "ubsan_type_hash.cpp",
++        "ubsan_type_hash_itanium.cpp",
++        "ubsan_type_hash_win.cpp",
++    ],
++    hdrs = [
++        ":ubsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "RTUbsan_standalone",
++    srcs = [
++        "ubsan_diag_standalone.cpp",
++        "ubsan_init_standalone.cpp",
++        "ubsan_signals_standalone.cpp",
++    ],
++    hdrs = [
++        ":ubsan_headers",
++        "//compiler-rt/lib/interception:interception_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "clang_rt.ubsan_standalone",
++    srcs = [
++        "ubsan_init_standalone_preinit.cpp",
++    ],
++    hdrs = [
++        ":ubsan_headers",
++        "//compiler-rt/lib/sanitizer_common:sanitizer_impl_headers",
++    ],
++    compilation_mode = "bootstrap",
++    includes = ["compiler-rt/lib"],
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTUbsan",
++        ":RTUbsan_standalone",
++        "//compiler-rt/lib/interception:RTInterception",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommon",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonCoverage",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonLibc",
++        "//compiler-rt/lib/sanitizer_common:RTSanitizerCommonSymbolizer",
++    ],
++)
++
++ll_library(
++    name = "clang_rt.ubsan_standalone_cxx",
++    compilation_mode = "bootstrap",
++    visibility = ["//visibility:public"],
++    deps = [
++        ":RTUbsan_cxx",
++    ],
++)
+diff --git a/utils/bazel/llvm-project-overlay/libcxx/BUILD.bazel b/utils/bazel/llvm-project-overlay/libcxx/BUILD.bazel
+new file mode 100644
+index 000000000000..03cf99c31787
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/libcxx/BUILD.bazel
+@@ -0,0 +1,323 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
++
++STD_PARTITIONS = [
++    "algorithm",
++    "any",
++    "array",
++    "atomic",
++    "barrier",
++    "bit",
++    "bitset",
++    "cassert",
++    "cctype",
++    "cerrno",
++    "cfenv",
++    "cfloat",
++    "charconv",
++    "chrono",
++    "cinttypes",
++    "climits",
++    "clocale",
++    "cmath",
++    "codecvt",
++    "compare",
++    "complex",
++    "concepts",
++    "condition_variable",
++    "coroutine",
++    "csetjmp",
++    "csignal",
++    "cstdarg",
++    "cstddef",
++    "cstdio",
++    "cstdlib",
++    "cstdint",
++    "cstring",
++    "ctime",
++    "cuchar",
++    "cwchar",
++    "cwctype",
++    "deque",
++    "exception",
++    "execution",
++    "expected",
++    "filesystem",
++    "flat_map",
++    "flat_set",
++    "format",
++    "forward_list",
++    "fstream",
++    "functional",
++    "future",
++    "generator",
++    "hazard_pointer",
++    "initializer_list",
++    "iomanip",
++    "ios",
++    "iosfwd",
++    "iostream",
++    "istream",
++    "iterator",
++    "latch",
++    "limits",
++    "list",
++    "locale",
++    "map",
++    "mdspan",
++    "memory",
++    "memory_resource",
++    "mutex",
++    # "new",  # Needs special treatment. Module is called __new.
++    "numbers",
++    "numeric",
++    "optional",
++    "ostream",
++    "print",
++    "queue",
++    "random",
++    "ranges",
++    "ratio",
++    "rcu",
++    "regex",
++    "scoped_allocator",
++    "semaphore",
++    "set",
++    "shared_mutex",
++    "source_location",
++    "span",
++    "spanstream",
++    "sstream",
++    "stack",
++    "stacktrace",
++    "stdexcept",
++    "stdfloat",
++    "stop_token",
++    "streambuf",
++    "string",
++    "string_view",
++    "strstream",
++    "syncstream",
++    "system_error",
++    "text_encoding",
++    "thread",
++    "tuple",
++    "typeindex",
++    "typeinfo",
++    "type_traits",  # Manually had to include <functional>.
++    "unordered_map",
++    "unordered_set",
++    "utility",
++    "valarray",
++    "variant",
++    "vector",
++    "version",
++]
++
++expand_template(
++    name = "module_modulemap_gen",
++    out = "include/module.modulemap",
++    substitutions = {
++        "@requires_LIBCXX_ENABLE_LOCALIZATION@": "",
++        "@requires_LIBCXX_ENABLE_FILESYSTEM@": "",
++        "@requires_LIBCXX_ENABLE_THREADS@": "",
++        "@requires_LIBCXX_ENABLE_WIDE_CHARACTERS@": "",
++    },
++    template = "include/module.modulemap.in",
++)
++
++NO = "/* Undefined by Bazel. */"
++
++expand_template(
++    name = "__config_site_gen",
++    out = "include/__config_site",
++    substitutions = {
++        "#cmakedefine _LIBCPP_ABI_VERSION @_LIBCPP_ABI_VERSION@": "#define _LIBCPP_ABI_VERSION 1",
++        "#cmakedefine _LIBCPP_ABI_NAMESPACE @_LIBCPP_ABI_NAMESPACE@": "#define _LIBCPP_ABI_NAMESPACE __1",
++        "#cmakedefine _LIBCPP_ABI_FORCE_ITANIUM": NO,
++        "#cmakedefine _LIBCPP_ABI_FORCE_MICROSOFT": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_THREADS": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_MONOTONIC_CLOCK": NO,
++        "#cmakedefine _LIBCPP_HAS_MUSL_LIBC": NO,
++        "#cmakedefine _LIBCPP_HAS_THREAD_API_PTHREAD": NO,
++        "#cmakedefine _LIBCPP_HAS_THREAD_API_EXTERNAL": NO,
++        "#cmakedefine _LIBCPP_HAS_THREAD_API_WIN32": NO,
++        "#cmakedefine _LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS": "#define _LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS",
++        "#cmakedefine _LIBCPP_NO_VCRUNTIME": NO,
++        "#cmakedefine _LIBCPP_TYPEINFO_COMPARISON_IMPLEMENTATION @_LIBCPP_TYPEINFO_COMPARISON_IMPLEMENTATION@": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_FILESYSTEM": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_RANDOM_DEVICE": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_LOCALIZATION": NO,
++        "#cmakedefine _LIBCPP_HAS_NO_WIDE_CHARACTERS": NO,
++        # PSTL backends.
++        "#cmakedefine _LIBCPP_PSTL_CPU_BACKEND_SERIAL": "#define _LIBCPP_PSTL_CPU_BACKEND_SERIAL",
++        "#cmakedefine _LIBCPP_PSTL_CPU_BACKEND_THREAD": NO,
++        "#cmakedefine _LIBCPP_PSTL_CPU_BACKEND_LIBDISPATCH": NO,
++        # Hardening.
++        # TODO: Evaluate performance impact of this. If it isn't noticeable for
++        #       most use-cases, enable it.
++        "#cmakedefine01 _LIBCPP_ENABLE_HARDENED_MODE_DEFAULT": "#define _LIBCPP_ENABLE_HARDENED_MODE_DEFAULT 0",
++        "#cmakedefine01 _LIBCPP_ENABLE_DEBUG_MODE_DEFAULT": "#define _LIBCPP_ENABLE_DEBUG_MODE_DEFAULT 0",
++        "@_LIBCPP_ABI_DEFINES@": NO,
++        "@_LIBCPP_EXTRA_SITE_DEFINES@": NO,
++    },
++    template = "include/__config_site.in",
++)
++
++filegroup(
++    name = "headers",
++    srcs = glob(["include/**/*"]) + [
++        ":__config_site_gen",
++        ":module_modulemap_gen",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++filegroup(
++    name = "sources",
++    srcs = glob(["src/**/*"]),
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "libcxx",
++    srcs = [
++        "src/algorithm.cpp",
++        "src/any.cpp",
++        "src/atomic.cpp",
++        "src/barrier.cpp",
++        "src/bind.cpp",
++        "src/charconv.cpp",
++        "src/chrono.cpp",
++        "src/condition_variable.cpp",
++        "src/condition_variable_destructor.cpp",
++        "src/exception.cpp",
++        "src/filesystem/directory_entry.cpp",
++        "src/filesystem/directory_iterator.cpp",
++        "src/filesystem/filesystem_clock.cpp",
++        "src/filesystem/filesystem_error.cpp",
++        "src/filesystem/operations.cpp",
++        "src/filesystem/path.cpp",
++        "src/functional.cpp",
++        "src/future.cpp",
++        "src/hash.cpp",
++        "src/ios.cpp",
++        "src/ios.instantiations.cpp",
++        "src/iostream.cpp",
++        "src/legacy_pointer_safety.cpp",
++        "src/locale.cpp",
++        "src/memory.cpp",
++        "src/mutex.cpp",
++        "src/mutex_destructor.cpp",
++        # "src/new.cpp",  # We pull this from libcxxabi for now.
++        "src/new_handler.cpp",
++        "src/new_helpers.cpp",
++        "src/optional.cpp",
++        "src/random.cpp",
++        "src/random_shuffle.cpp",
++        "src/regex.cpp",
++        "src/ryu/d2fixed.cpp",
++        "src/ryu/d2s.cpp",
++        "src/ryu/f2s.cpp",
++        "src/shared_mutex.cpp",
++        "src/stdexcept.cpp",
++        "src/string.cpp",
++        "src/strstream.cpp",
++        "src/system_error.cpp",
++        "src/thread.cpp",
++        "src/typeinfo.cpp",
++        "src/valarray.cpp",
++        "src/variant.cpp",
++        "src/vector.cpp",
++    ],
++    hdrs = [
++        # Files in src/include.
++        "src/include/apple_availability.h",
++        "src/include/atomic_support.h",
++        "src/include/config_elast.h",
++        "src/include/refstring.h",
++        "src/include/ryu/common.h",
++        "src/include/ryu/d2fixed.h",
++        "src/include/ryu/d2fixed_full_table.h",
++        "src/include/ryu/d2s.h",
++        "src/include/ryu/d2s_full_table.h",
++        "src/include/ryu/d2s_intrinsics.h",
++        "src/include/ryu/digit_table.h",
++        "src/include/ryu/f2s.h",
++        "src/include/ryu/ryu.h",
++        "src/include/to_chars_floating_point.h",
++
++        # Filesystem files.
++        "src/filesystem/error.h",  # Not in CMake.
++        "src/filesystem/file_descriptor.h",
++        "src/filesystem/format_string.h",  # Not in CMake.
++        "src/filesystem/path_parser.h",
++        "src/filesystem/posix_compat.h",
++        "src/filesystem/time_utils.h",
++
++        # Support ipp files.
++        "src/support/runtime/exception_fallback.ipp",
++        "src/support/runtime/exception_glibcxx.ipp",
++        "src/support/runtime/exception_libcxxabi.ipp",
++        "src/support/runtime/exception_libcxxrt.ipp",
++        "src/support/runtime/exception_msvc.ipp",
++        "src/support/runtime/exception_pointer_cxxabi.ipp",
++        "src/support/runtime/exception_pointer_glibcxx.ipp",
++        "src/support/runtime/exception_pointer_msvc.ipp",
++        "src/support/runtime/exception_pointer_unimplemented.ipp",
++        "src/support/runtime/stdexcept_default.ipp",
++        "src/support/runtime/stdexcept_vcruntime.ipp",
++
++        # Headers for building iostream.
++        "src/include/sso_allocator.h",
++        "src/iostream_init.h",
++        "src/std_stream.h",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-std=c++2b",
++        "-faligned-allocation",
++        "-fno-omit-frame-pointer",
++        "-funwind-tables",
++        "-fstrict-aliasing",
++        "-fvisibility-inlines-hidden",
++        "-Wno-user-defined-literals",
++        "-Wno-reserved-module-identifier",
++
++        # TODO: Remove this after resolve of
++        # https://github.com/llvm/llvm-project/issues/62844
++        "-Wno-deprecated-declarations",
++    ],
++    defines = [
++        "_LIBCPP_BUILDING_LIBRARY",
++        "_LIBCPP_ENABLE_EXPERIMENTAL",
++        "_LIBCPP_HAS_NO_PRAGMA_SYSTEM_HEADER",
++        "_LIBCPP_LINK_PTHREAD_LIB",
++        "_LIBCPP_LINK_RT_LIB",
++        "_LIBCPP_REMOVE_TRANSITIVE_INCLUDES",
++        "_LIBCXXABI_BUILDING_LIBRARY",
++        "LIBCXX_BUILDING_LIBCXXABI",
++    ],
++    exposed_angled_includes = [
++        "libcxx/include",
++        "$(GENERATED)/libcxx/include",
++    ],
++    exposed_hdrs = [
++        "//libcxx:headers",
++    ],
++    exposed_interfaces = {
++        "modules/std.cppm": "std",
++    },
++    includes = [
++        "libcxx/src",
++    ],
++    interfaces = {
++        "modules/std/{}.cppm".format(name): "std:{}".format(name)
++        for name in STD_PARTITIONS
++    } | {
++        "modules/std/new.cppm": "std:__new",
++    },
++    visibility = ["//visibility:public"],
++    deps = ["//libcxxabi"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/libcxxabi/BUILD.bazel b/utils/bazel/llvm-project-overlay/libcxxabi/BUILD.bazel
+new file mode 100644
+index 000000000000..557a443a558e
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/libcxxabi/BUILD.bazel
+@@ -0,0 +1,94 @@
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++filegroup(
++    name = "headers",
++    srcs = [
++        "include/__cxxabi_config.h",
++        "include/cxxabi.h",
++    ],
++    visibility = ["//visibility:public"],
++)
++
++ll_library(
++    name = "libcxxabi",
++    srcs = [
++        # C++ABI files
++        "src/cxa_aux_runtime.cpp",
++        "src/cxa_default_handlers.cpp",
++        "src/cxa_demangle.cpp",
++        "src/cxa_exception_storage.cpp",
++        "src/cxa_guard.cpp",
++        "src/cxa_handlers.cpp",
++        "src/cxa_thread_atexit.cpp",
++        "src/cxa_vector.cpp",
++        "src/cxa_virtual.cpp",
++
++        # C++ STL files
++        "src/stdlib_exception.cpp",
++        "src/stdlib_stdexcept.cpp",
++        "src/stdlib_typeinfo.cpp",
++
++        # Internal files
++        "src/abort_message.cpp",
++        "src/fallback_malloc.cpp",
++        "src/private_typeinfo.cpp",
++
++        # New/Delete
++        "src/stdlib_new_delete.cpp",
++
++        # Exceptions
++        "src/cxa_exception.cpp",
++        "src/cxa_personality.cpp",
++    ],
++    hdrs = glob(["include/**"]) + [
++        # C++ABI files.
++        "src/cxa_handlers.h",
++        "src/cxa_guard_impl.h",
++
++        # C++ STL files.
++        "src/abort_message.h",
++        "src/fallback_malloc.h",
++        "src/private_typeinfo.h",
++
++        # Exceptions.
++        "src/cxa_exception.h",
++
++        # Demangle
++        "src/demangle/DemangleConfig.h",
++        "src/demangle/ItaniumDemangle.h",
++        "src/demangle/ItaniumNodes.def",
++        "src/demangle/StringViewExtras.h",
++        "src/demangle/Utility.h",
++    ],
++    angled_includes = [
++        "libcxx/include",
++        "$(GENERATED)/libcxx/include",
++        "libcxxabi/include",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-std=c++20",
++        "-faligned-allocation",
++        "-funwind-tables",
++        "-fstrict-aliasing",
++        "-fvisibility-inlines-hidden",
++    ],
++    data = [
++        "//libcxx:headers",
++        "//libcxx:sources",
++    ],
++    defines = [
++        "LIBCXX_BUILDING_LIBCXXABI",
++        "HAVE___CXA_THREAD_ATEXIT_IMPL",  # 3 underscores.
++        "LIBCXXABI_USE_LLVM_UNWINDER",
++        "_LIBCPP_BUILDING_LIBRARY",
++        "_LIBCXXABI_BUILDING_LIBRARY",
++        "_LIBCXXABI_LINK_PTHREAD_LIB",
++    ],
++    exposed_angled_includes = ["libcxxabi/include"],
++    exposed_hdrs = [":headers"],
++    includes = [
++        "libcxx/src",
++    ],
++    visibility = ["//visibility:public"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/libunwind/BUILD.bazel b/utils/bazel/llvm-project-overlay/libunwind/BUILD.bazel
+index f8448fb0e726..00b3b8d4332d 100644
+--- a/utils/bazel/llvm-project-overlay/libunwind/BUILD.bazel
++++ b/utils/bazel/llvm-project-overlay/libunwind/BUILD.bazel
+@@ -1,21 +1,51 @@
+-# This file is licensed under the Apache License v2.0 with LLVM Exceptions.
+-# See https://llvm.org/LICENSE.txt for license information.
+-# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++load("@@//:rules_ll_compat.bzl", "ll_library")
+ 
+-package(
+-    default_visibility = ["//visibility:public"],
++filegroup(
++    name = "libunwind_headers",
++    srcs = glob(["include/**"]),
++    visibility = ["//visibility:public"],
+ )
+ 
+-licenses(["notice"])
+-
+-# The ld64 linker and lld-macho use the libunwind headers only for the constant
+-# definitions, in order to parse and convert DWARF to the compact encoding.
+-cc_library(
+-    name = "unwind_headers_only",
++ll_library(
++    name = "libll_unwind",
++    srcs = [
++        "src/Unwind-EHABI.cpp",
++        "src/Unwind-seh.cpp",
++        "src/Unwind-sjlj.c",
++        "src/UnwindLevel1.c",
++        "src/UnwindLevel1-gcc-ext.c",
++        "src/UnwindRegistersRestore.S",
++        "src/UnwindRegistersSave.S",
++        "src/libunwind.cpp",
++    ],
+     hdrs = [
+-        "include/__libunwind_config.h",
+-        "include/libunwind.h",
+-        "include/mach-o/compact_unwind_encoding.h",
++        "src/AddressSpace.hpp",
++        "src/CompactUnwinder.hpp",
++        "src/DwarfInstructions.hpp",
++        "src/DwarfParser.hpp",
++        "src/EHHeaderParser.hpp",
++        "src/FrameHeaderCache.hpp",
++        "src/RWMutex.hpp",
++        "src/Registers.hpp",
++        "src/Unwind-EHABI.h",
++        "src/UnwindCursor.hpp",
++        "src/assembly.h",
++        "src/cet_unwind.h",
++        "src/config.h",
++        "src/dwarf2.h",
++        "src/libunwind_ext.h",
++    ],
++    compilation_mode = "bootstrap",
++    compile_flags = [
++        "-faligned-allocation",
++        "-funwind-tables",
++        "-fstrict-aliasing",
++        "-fvisibility-inlines-hidden",
++    ],
++    exposed_angled_includes = ["libunwind/include"],
++    exposed_hdrs = [
++        ":libunwind_headers",
+     ],
+-    strip_include_prefix = "include",
++    visibility = ["//visibility:public"],
++    deps = ["//compiler-rt:libll_compiler-rt"],
+ )
+diff --git a/utils/bazel/llvm-project-overlay/openmp/BUILD.bazel b/utils/bazel/llvm-project-overlay/openmp/BUILD.bazel
+new file mode 100644
+index 000000000000..fb9eba51e119
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/openmp/BUILD.bazel
+@@ -0,0 +1,158 @@
++load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
++load("@@//:rules_ll_compat.bzl", "ll_library")
++
++LIBOMP_SOURCES = [
++    "runtime/src/kmp_alloc.cpp",
++    "runtime/src/kmp_atomic.cpp",
++    "runtime/src/kmp_csupport.cpp",
++    "runtime/src/kmp_debug.cpp",
++    "runtime/src/kmp_itt.cpp",
++    "runtime/src/kmp_environment.cpp",
++    "runtime/src/kmp_error.cpp",
++    "runtime/src/kmp_global.cpp",
++    "runtime/src/kmp_i18n.cpp",
++    "runtime/src/kmp_io.cpp",
++    "runtime/src/kmp_runtime.cpp",
++    "runtime/src/kmp_settings.cpp",
++    "runtime/src/kmp_str.cpp",
++    "runtime/src/kmp_tasking.cpp",
++    "runtime/src/kmp_threadprivate.cpp",
++    "runtime/src/kmp_utility.cpp",
++    "runtime/src/kmp_barrier.cpp",
++    "runtime/src/kmp_wait_release.cpp",
++    "runtime/src/kmp_affinity.cpp",
++    "runtime/src/kmp_dispatch.cpp",
++    "runtime/src/kmp_lock.cpp",
++    "runtime/src/kmp_sched.cpp",
++
++    # Linux specific.
++    "runtime/src/z_Linux_util.cpp",
++    "runtime/src/kmp_gsupport.cpp",
++
++    # Additional files.
++    "runtime/src/thirdparty/ittnotify/ittnotify_static.cpp",  # itt notify.
++    "runtime/src/kmp_debugger.cpp",  # debugger
++    # "runtime/src/kmp_stats.cpp", # stats
++    # "runtime/src/kmp_stats_timing.cpp", # stats
++    "runtime/src/kmp_taskdeps.cpp",
++    "runtime/src/kmp_cancel.cpp",
++
++    # Other.
++    "runtime/src/kmp_ftn_cdecl.cpp",
++    "runtime/src/kmp_ftn_extra.cpp",
++    "runtime/src/kmp_version.cpp",
++    "runtime/src/ompt-general.cpp",  # ompt
++    "runtime/src/ompt-specific.cpp",  # ompt, missing in CMake.
++    "runtime/src/ompd-specific.cpp",  # ompd
++
++    # GNU Asm.
++    "runtime/src/z_Linux_asm.S",
++]
++
++expand_template(
++    name = "omp_header",
++    out = "runtime/src/include/omp.h",
++    substitutions = {
++        "@LIBOMP_VERSION_MAJOR@": "5",
++        "@LIBOMP_VERSION_MINOR@": "0",
++        "@LIBOMP_VERSION_BUILD@": "0",
++        "@LIBOMP_BUILD_DATE@": "Masked",
++    },
++    template = "runtime/src/include/omp.h.var",
++    visibility = ["//visibility:public"],
++)
++
++expand_template(
++    name = "omp_tools_h",
++    out = "runtime/src/include/omp-tools.h",
++    substitutions = {},
++    template = "runtime/src/include/omp-tools.h.var",
++    visibility = ["//visibility:public"],
++)
++
++expand_template(
++    name = "kmp_config_h",
++    out = "runtime/src/kmp_config.h",
++    substitutions = {
++        "#cmakedefine01 DEBUG_BUILD": "#define DEBUG_BUILD 0",
++        "#cmakedefine01 RELWITHDEBINFO_BUILD": "#define RELWITHDEBINFO_BUILD 0",
++        "#cmakedefine01 LIBOMP_USE_ITT_NOTIFY": "#define LIBOMP_USE_ITT_NOTIFY 1",
++        "#cmakedefine01 LIBOMP_USE_VERSION_SYMBOLS": "#define LIBOMP_USE_VERSION_SYMBOLS 1",
++        "#cmakedefine01 LIBOMP_HAVE_WEAK_ATTRIBUTE": "#define LIBOMP_HAVE_WEAK_ATTRIBUTE 1",
++        "#cmakedefine01 LIBOMP_HAVE_PSAPI": "#define LIBOMP_HAVE_PSAPI 0",
++        "#cmakedefine01 LIBOMP_STATS": "#define LIBOMP_STATS 0",
++        "#cmakedefine01 LIBOMP_HAVE_X86INTRIN_H": "#define LIBOMP_HAVE_X86INTRIN_H 0",
++        "#cmakedefine01 LIBOMP_HAVE___BUILTIN_READCYCLECOUNTER": "#define LIBOMP_HAVE___BUILTIN_READCYCLECOUNTER 0",
++        "#cmakedefine01 LIBOMP_HAVE___RDTSC": "#define LIBOMP_HAVE___RDTSC 0",
++        "#cmakedefine01 LIBOMP_USE_DEBUGGER": "#define LIBOMP_USE_DEBUGGER 0",
++        "#cmakedefine01 LIBOMP_OMPT_DEBUG": "#define LIBOMP_OMPT_DEBUG 0",
++        "#cmakedefine01 LIBOMP_OMPT_SUPPORT": "#define LIBOMP_OMPT_SUPPORT 1",
++        "#cmakedefine01 LIBOMP_OMPD_SUPPORT": "#define LIBOMP_OMPD_SUPPORT 1",
++        "#cmakedefine01 LIBOMP_OMPX_TASKGRAPH": "#define LIBOMP_OMPX_TASKGRAPH 1",
++        "#cmakedefine01 LIBOMP_PROFILING_SUPPORT": "#define LIBOMP_PROFILING_SUPPORT 0",
++        "#cmakedefine01 LIBOMP_OMPT_OPTIONAL": "#define LIBOMP_OMPT_OPTIONAL 1",
++        "#cmakedefine01 LIBOMP_USE_ADAPTIVE_LOCKS": "#define LIBOMP_USE_ADAPTIVE_LOCKS 1",
++        "#cmakedefine01 LIBOMP_USE_INTERNODE_ALIGNMENT": "#define LIBOMP_USE_INTERNODE_ALIGNMENT 0",
++        "#cmakedefine01 LIBOMP_ENABLE_ASSERTIONS": "#define LIBOMP_ENABLE_ASSERTIONS 0",
++        "#cmakedefine01 LIBOMP_USE_HIER_SCHED": "#define LIBOMP_USE_HIER_SCHED 0",
++        "#cmakedefine01 STUBS_LIBRARY": "#define STUBS_LIBRARY 0",
++        "#cmakedefine01 LIBOMP_USE_HWLOC": "#define LIBOMP_USE_HWLOC 0",
++        "#cmakedefine01 LIBOMP_ENABLE_SHARED": "#define LIBOMP_ENABLE_SHARED 1",
++        "@LIBOMP_LEGAL_ARCH@": "Intel(R) 64",
++        "@LIBOMP_LIB_FILE@": "libomp.so",
++        "@LIBOMP_VERSION_MAJOR@": "5",
++        "@LIBOMP_VERSION_MINOR@": "0",
++        "#cmakedefine01 MSVC": "#define MSVC 0",
++        "#cmakedefine01 LIBOMP_HAVE_WAITPKG_INTRINSICS": "#define LIBOMP_HAVE_WAITPKG_INTRINSICS 1",
++        "#cmakedefine01 LIBOMP_HAVE_RTM_INTRINSICS": "#define LIBOMP_HAVE_RTM_INTRINSICS 1",
++        "#cmakedefine01 LIBOMP_HAVE_IMMINTRIN_H": "#define LIBOMP_HAVE_IMMINTRIN_H 1",
++        "#cmakedefine01 LIBOMP_HAVE_INTRIN_H": "#define LIBOMP_HAVE_INTRIN_H 0",
++        "#cmakedefine01 LIBOMP_HAVE_ATTRIBUTE_WAITPKG": "#define LIBOMP_HAVE_ATTRIBUTE_WAITPKG 1",
++        "#cmakedefine01 LIBOMP_HAVE_ATTRIBUTE_RTM": "#define LIBOMP_HAVE_ATTRIBUTE_RTM 1",
++        "#cmakedefine01 LIBOMP_ARCH_AARCH64_A64FX": "#define LIBOMP_ARCH_AARCH64_A64FX 0",
++        "#cmakedefine01 LIBOMP_HAVE_XMMINTRIN_H": "#define LIBOMP_HAVE_XMMINTRIN_H 1",
++        "#cmakedefine01 LIBOMP_HAVE__MM_MALLOC": "#define LIBOMP_HAVE__MM_MALLOC 1",
++        "#cmakedefine01 LIBOMP_HAVE_ALIGNED_ALLOC": "#define LIBOMP_HAVE_ALIGNED_ALLOC 1",
++        "#cmakedefine01 LIBOMP_HAVE_POSIX_MEMALIGN": "#define LIBOMP_HAVE_POSIX_MEMALIGN 1",
++        "#cmakedefine01 LIBOMP_HAVE__ALIGNED_MALLOC": "#define LIBOMP_HAVE__ALIGNED_MALLOC 0",
++        "#cmakedefine01 OPENMP_ENABLE_LIBOMPTARGET": "#define ENABLE_LIBOMPTARGET OPENMP_ENABLE_LIBOMPTARGET",  #TODO: enable.
++    },
++    template = "runtime/src/kmp_config.h.cmake",
++)
++
++ll_library(
++    name = "libomp",
++    srcs = LIBOMP_SOURCES,
++    # Includes the following manually generated patched-in headers.
++    # We ultimately need these to be generated as part of the build.
++    # "runtime/src/kmp_i18n_default.inc",
++    # "runtime/src/kmp_i18n_id.inc",
++    hdrs = glob([
++        "runtime/src/*.inc",
++        "runtime/src/*.h",
++        "runtime/src/*.inl",
++        "runtime/src/thirdparty/ittnotify/*.h",
++        "runtime/src/thirdparty/ittnotify/legacy/*.h",
++    ]) + [
++        ":kmp_config_h",
++        ":omp_header",
++        ":omp_tools_h",
++    ],
++    compile_flags = [
++        "-std=c++17",
++        "-Wno-switch",
++    ],
++    exposed_angled_includes = [
++        "$(GENERATED)/openmp/runtime/src/include",
++        "openmp/runtime/src/include",
++    ],
++    exposed_hdrs = [
++        "runtime/src/include/omp.h",
++    ],
++    includes = [
++        "$(GENERATED)/openmp/runtime/src",
++        "openmp/runtime/src",
++        "openmp/runtime/src/thirdparty/ittnotify",
++    ],
++    visibility = ["//visibility:public"],
++)
+diff --git a/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_default.inc b/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_default.inc
+new file mode 100644
+index 000000000000..8e0a7b7ec6da
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_default.inc
+@@ -0,0 +1,487 @@
++// Do not edit this file! //
++// Generated statically as part of rules_ll. //
++
++static char const *
++__kmp_i18n_default_meta[] =
++    {
++        NULL,
++        "English",
++        "USA",
++        "1033",
++        "2",
++        "20170523",
++        NULL
++    };
++
++static char const *
++__kmp_i18n_default_strings[] =
++    {
++        NULL,
++        "Error",
++        "(unknown file)",
++        "not a number",
++        "bad unit",
++        "illegal characters",
++        "value too large",
++        "value too small",
++        "value is not a multiple of 4k",
++        "Unknown processor topology",
++        "Cannot open /proc/cpuinfo",
++        "/proc/cpuinfo",
++        "cpuinfo file invalid (No processor records)",
++        "cpuinfo file invalid (Too many processor records)",
++        "Cannot rewind cpuinfo file",
++        "cpuinfo file invalid (long line)",
++        "cpuinfo file contains too many entries",
++        "cpuinfo file missing processor field",
++        "cpuinfo file missing physical id field",
++        "cpuinfo file invalid (missing val)",
++        "cpuinfo file invalid (duplicate field)",
++        "Physical node/pkg/core/thread ids not unique",
++        "APIC not present",
++        "Invalid cpuid info",
++        "APIC ids not unique",
++        "Inconsistent cpuid info",
++        "Out of heap memory",
++        "Memory allocation failed",
++        "core",
++        "thread",
++        "package",
++        "node",
++        "<undef>",
++        "decoding legacy APIC ids",
++        "parsing /proc/cpuinfo",
++        "value is not defined",
++        "Effective settings:",
++        "User settings:",
++        "warning: pointers or size don't make sense",
++        "CPU",
++        "TPU",
++        "TPUs per package",
++        "HT enabled",
++        "HT disabled",
++        "decoding x2APIC ids",
++        "cpuid leaf 11 not supported",
++        "cpuid leaf 4 not supported",
++        "thread ids not unique",
++        "using pthread info",
++        "legacy APIC ids not unique",
++        "x2APIC ids not unique",
++        "OPENMP DISPLAY ENVIRONMENT BEGIN",
++        "OPENMP DISPLAY ENVIRONMENT END",
++        "[device]",
++        "[host]",
++        "tile",
++        "tiles",
++        "threads",
++        "cores",
++        "socket",
++        "sockets",
++        "die",
++        "dice",
++        "module",
++        "modules",
++        "L1 cache",
++        "L1 caches",
++        "L2 cache",
++        "L2 caches",
++        "L3 cache",
++        "L3 caches",
++        "NUMA domain",
++        "NUMA domains",
++        "processor group",
++        "processor groups",
++        "unknown",
++        "cpuid leaf 31 not supported",
++        "Hwloc api failure",
++        "LL cache",
++        "LL caches",
++        NULL
++    };
++
++static char const *
++__kmp_i18n_default_formats[] =
++    {
++        NULL,
++        "OMP: Info #%1$d: %2$s\n",
++        "OMP: Warning #%1$d: %2$s\n",
++        "OMP: Error #%1$d: %2$s\n",
++        "OMP: System error #%1$d: %2$s\n",
++        "OMP: Hint %1$s\n",
++        "%1$s pragma (at %2$s:%3$s():%4$s)",
++        NULL
++    };
++
++static char const *
++__kmp_i18n_default_messages[] =
++    {
++        NULL,
++        "Library is \"serial\".",
++        "Cannot open message catalog \"%1$s\":",
++        "Default messages will be used.",
++        "%1$s: Lock is uninitialized",
++        "%1$s: Lock was initialized as simple, but used as nestable",
++        "%1$s: Lock was initialized as nestable, but used as simple",
++        "%1$s: Lock is already owned by requesting thread",
++        "%1$s: Lock is still owned by a thread",
++        "%1$s: Attempt to release a lock not owned by any thread",
++        "%1$s: Attempt to release a lock owned by another thread",
++        "Stack overflow detected for OpenMP thread #%1$d",
++        "Stack overlap detected. ",
++        "Assertion failure at %1$s(%2$d).",
++        "Unable to register a new user thread.",
++        "Initializing %1$s, but found %2$s already initialized.",
++        "Cannot open file \"%1$s\" for reading:",
++        "Getting environment variable \"%1$s\" failed:",
++        "Setting environment variable \"%1$s\" failed:",
++        "Getting environment failed:",
++        "%1$s=\"%2$s\": Wrong value, boolean expected.",
++        "No Helper Thread support built in this OMP library.",
++        "Helper thread failed to soft terminate.",
++        "Buffer overflow detected.",
++        "Real-time scheduling policy is not supported.",
++        "OMP application is running at maximum priority with real-time scheduling policy. ",
++        "Changing priority of the monitor thread failed:",
++        "Deadlocks are highly possible due to monitor thread starvation.",
++        "Unable to set monitor thread stack size to %1$lu bytes:",
++        "Unable to set OMP thread stack size to %1$lu bytes:",
++        "Thread attribute initialization failed:",
++        "Thread attribute destroying failed:",
++        "OMP thread joinable state setting failed:",
++        "Monitor thread joinable state setting failed:",
++        "System unable to allocate necessary resources for OMP thread:",
++        "System unable to allocate necessary resources for the monitor thread:",
++        "Unable to terminate OMP thread:",
++        "Wrong schedule type %1$d, see <omp.h> or <omp_lib.h> file for the list of values supported.",
++        "Unknown scheduling type \"%1$d\".",
++        "%1$s value \"%2$s\" is invalid.",
++        "%1$s value \"%2$s\" is too small.",
++        "%1$s value \"%2$s\" is too large.",
++        "%1$s: \"%2$s\" is an invalid value; ignored.",
++        "%1$s release value \"%2$s\" is invalid.",
++        "%1$s gather value \"%2$s\" is invalid.",
++        "%1$s supported only on debug builds; ignored.",
++        "Syntax error: Usage: %1$s=[ routine=<func> | filename=<file> | range=<lb>:<ub> | excl_range=<lb>:<ub> ],...",
++        "Unbalanced quotes in %1$s.",
++        "Empty string specified for %1$s; ignored.",
++        "%1$s value is too long; ignored.",
++        "%1$s: Invalid clause in \"%2$s\".",
++        "Empty clause in %1$s.",
++        "%1$s value \"%2$s\" is invalid chunk size.",
++        "%1$s value \"%2$s\" is to large chunk size.",
++        "%1$s value \"%2$s\" is ignored.",
++        "Cannot get processor frequency, using zero KMP_ITT_PREPARE_DELAY.",
++        "%1$s must be set prior to first parallel region; ignored.",
++        "%1$s: parameter has been specified already, ignoring \"%2$s\".",
++        "%1$s: parameter invalid, ignoring \"%2$s\".",
++        "%1$s: too many integer parameters specified, ignoring \"%2$s\".",
++        "%1$s: too many integer parameters specified for logical or physical type, ignoring \"%2$d\".",
++        "%1$s: '%2$s' type does not take any integer parameters, ignoring them.",
++        "%1$s: proclist not specified with explicit affinity type, using \"none\".",
++        "%1$s: proclist specified, setting affinity type to \"explicit\".",
++        "%1$s: proclist specified without \"explicit\" affinity type, proclist ignored.",
++        "%1$s: syntax error, not using affinity.",
++        "%1$s: range error (zero stride), not using affinity.",
++        "%1$s: range error (%2$d > %3$d), not using affinity.",
++        "%1$s: range error (%2$d < %3$d & stride < 0), not using affinity.",
++        "%1$s: range error ((%2$d-%3$d)/%4$d too big), not using affinity.",
++        "%1$s: %2$s is defined. %3$s will be ignored.",
++        "%1$s: affinity not supported, using \"disabled\".",
++        "%1$s: affinity only supported for Intel(R) Architecture Processors.",
++        "%1$s: getaffinity system call not supported.",
++        "%1$s: setaffinity system call not supported.",
++        "%1$s: pthread_aff_set_np call not found.",
++        "%1$s: pthread_get_num_resources_np call not found.",
++        "%1$s: the OS kernel does not support affinity.",
++        "%1$s: pthread_get_num_resources_np returned %2$d.",
++        "%1$s: cannot determine proper affinity mask size.",
++        "%1$s=\"%2$s\": %3$s.",
++        "%1$s: extra trailing characters ignored: \"%2$s\".",
++        "%1$s: unknown method \"%2$s\".",
++        "KMP_STATS_TIMER: clock_gettime is undefined, using gettimeofday.",
++        "KMP_STATS_TIMER: \"%1$s\" needs additional parameter, e.g. 'clock_gettime,2'. Using gettimeofday.",
++        "KMP_STATS_TIMER: clock_gettime parameter \"%1$s\" is invalid, using gettimeofday.",
++        "KMP_STATS_TIMER: clock_gettime failed, using gettimeofday.",
++        "KMP_STATS_TIMER: clock function unknown (ignoring value \"%1$s\").",
++        "Unknown scheduling type detected.",
++        "Too many threads to use analytical guided scheduling - switching to iterative guided scheduling.",
++        "ittnotify: Lookup of \"%1$s\" function in \"%2$s\" library failed.",
++        "ittnotify: Loading \"%1$s\" library failed.",
++        "ittnotify: All itt notifications disabled.",
++        "ittnotify: Object state itt notifications disabled.",
++        "ittnotify: Mark itt notifications disabled.",
++        "ittnotify: Unloading \"%1$s\" library failed.",
++        "Cannot form a team with %1$d threads, using %2$d instead.",
++        "Requested number of active parallel levels \"%1$d\" is negative; ignored.",
++        "Requested number of active parallel levels \"%1$d\" exceeds supported limit; the following limit value will be used: \"%1$d\".",
++        "kmp_set_library must only be called from the top level serial thread; ignored.",
++        "Fatal system error detected.",
++        "Out of heap memory.",
++        "Clearing __KMP_REGISTERED_LIB env var failed.",
++        "Registering library with env var failed.",
++        "%1$s value \"%2$d\" will be used.",
++        "%1$s value \"%2$u\" will be used.",
++        "%1$s value \"%2$s\" will be used.",
++        "%1$s value \"%2$s\" will be used.",
++        "Mixing other barrier patterns with dist is prohibited. Using dist for all barrier patterns.",
++        "%1$s maximum value \"%2$d\" will be used.",
++        "%1$s minimum value \"%2$d\" will be used.",
++        "Memory allocation failed.",
++        "File name too long.",
++        "Lock table overflow.",
++        "Too many threads to use threadprivate directive.",
++        "%1$s: invalid mask.",
++        "Wrong definition.",
++        "Windows* OS: TLS Set Value failed.",
++        "Windows* OS: TLS out of indexes.",
++        "PDONE directive must be nested within a DO directive.",
++        "Cannot get number of available CPUs.",
++        "Assumed number of CPUs is 2.",
++        "Error initializing affinity - not using affinity.",
++        "Threads may migrate across all available OS procs (granularity setting too coarse).",
++        "Ignoring invalid OS proc ID %1$d.",
++        "No valid OS proc IDs specified - not using affinity.",
++        "%1$s - using \"flat\" OS <-> physical proc mapping.",
++        "%1$s: %2$s - using \"flat\" OS <-> physical proc mapping.",
++        "%1$s, line %2$d: %3$s - using \"flat\" OS <-> physical proc mapping.",
++        "%1$s: %2$s - exiting.",
++        "%1$s, line %2$d: %3$s - exiting.",
++        "Construct identifier invalid.",
++        "Thread identifier invalid.",
++        "runtime library not initialized.",
++        "Inconsistent THREADPRIVATE common block declarations are non-conforming and are unsupported. Either all threadprivate common blocks must be declared identically, or the largest instance of each threadprivate common block must be referenced first during the run.",
++        "Cannot set thread affinity mask.",
++        "Cannot set thread priority.",
++        "Cannot create thread.",
++        "Cannot create event.",
++        "Cannot set event.",
++        "Cannot close handle.",
++        "Unknown library type: %1$d.",
++        "Monitor did not reap properly.",
++        "Worker thread failed to join.",
++        "Cannot change thread affinity mask.",
++        "%1$s: Threads may migrate across %2$d innermost levels of machine",
++        "%1$s: decrease to %2$d threads",
++        "%1$s: increase to %2$d threads",
++        "%1$s: Internal thread %2$d bound to OS proc set %3$s",
++        "%1$s: Affinity capable, using cpuinfo file",
++        "%1$s: Affinity capable, using global cpuid info",
++        "%1$s: Affinity capable, using default \"flat\" topology",
++        "%1$s: Affinity not capable, using local cpuid info",
++        "%1$s: Affinity not capable, using cpuinfo file",
++        "%1$s: Affinity not capable, assuming \"flat\" topology",
++        "%1$s: Initial OS proc set respected: %2$s",
++        "%1$s: Initial OS proc set not respected: %2$s",
++        "%1$s: %2$d available OS procs",
++        "%1$s: Uniform topology",
++        "%1$s: Nonuniform topology",
++        "%1$s: %2$d packages x %3$d cores/pkg x %4$d threads/core (%5$d total cores)",
++        "%1$s: OS proc to physical thread map ([] => level not in map):",
++        "%1$s: OS proc <n> maps to <n>th package core 0",
++        "%1$s: OS proc %2$d maps to package %3$d [core %4$d] [thread %5$d]",
++        "%1$s: OS proc %2$d maps to [package %3$d] [core %4$d] [thread %5$d]",
++        "%1$s: OS proc %2$d maps to [package %3$d] [core %4$d] thread %5$d",
++        "%1$s: OS proc %2$d maps to [package %3$d] core %4$d [thread %5$d]",
++        "%1$s: OS proc %2$d maps to package %3$d [core %4$d] [thread %5$d]",
++        "%1$s: OS proc %2$d maps to [package %3$d] core %4$d thread %5$d",
++        "%1$s: OS proc %2$d maps to package %3$d core %4$d [thread %5$d]",
++        "%1$s: OS proc %2$d maps to package %3$d [core %4$d] thread %5$d",
++        "%1$s: OS proc %2$d maps to package %3$d core %4$d thread %5$d",
++        "%1$s: OS proc %2$d maps to %3$s",
++        "%1$s: Internal thread %2$d changed affinity mask from %3$s to %4$s",
++        "%1$s: OS proc %2$d maps to package %3$d, CPU %4$d, TPU %5$d",
++        "%1$s: OS proc %2$d maps to package %3$d, CPU %4$d",
++        "%1$s: HT enabled; %2$d packages; %3$d TPU; %4$d TPUs per package",
++        "%1$s: HT disabled; %2$d packages",
++        "Threads encountered barriers in different order. ",
++        "Function %1$s failed:",
++        "%1$s: %2$s packages x %3$d cores/pkg x %4$d threads/core (%5$d total cores)",
++        "Incompatible message catalog \"%1$s\": Version \"%2$s\" found, version \"%3$s\" expected.",
++        "%1$s: ignored because %2$s has been defined",
++        "%1$s: overrides %3$s specified before",
++        "%1$s: Tiles are only supported if KMP_TOPOLOGY_METHOD=hwloc, using granularity=package instead",
++        "%1$s: Tiles requested but were not detected on this HW, using granularity=package instead",
++        "%1$s: %2$d packages x %3$d tiles/pkg x %4$d cores/tile x %5$d threads/core (%6$d total cores)",
++        "%1$s: %2$d packages x %3$d nodes/pkg x %4$d cores/node x %5$d threads/core (%6$d total cores)",
++        "%1$s: %2$d packages x %3$d nodes/pkg x %4$d tiles/node x %5$d cores/tile x %6$d threads/core (%7$d total cores)",
++        "OMPT: Cannot determine workshare type; using the default (loop) instead. This issue is fixed in an up-to-date compiler.",
++        "Allocator %1$s is not available, will use default allocator.",
++        "%1$s: %2$s (%3$d total cores)",
++        "%1$s: granularity setting: %2$s does not exist in topology.  Using granularity=%3$s instead.",
++        "%1$s: hybrid core type detected: %2$d %3$s cores.",
++        "%1$s:   %2$d with core efficiency %3$d.",
++        "%1$s must be bound to a work-sharing or work-queuing construct with an \"ordered\" clause",
++        "Detected end of %1$s without first executing a corresponding beginning.",
++        "Iteration range too large in %1$s.",
++        "%1$s must not have a loop increment that evaluates to zero.",
++        "Expected end of %1$s; %2$s, however, has most recently begun execution.",
++        "%1$s is incorrectly nested within %2$s",
++        "%1$s cannot be executed multiple times during execution of one parallel iteration/section of %2$s",
++        "%1$s is incorrectly nested within %2$s of the same name",
++        "%1$s is incorrectly nested within %2$s that does not have an \"ordered\" clause",
++        "%1$s is incorrectly nested within %2$s but not within any of its \"task\" constructs",
++        "One thread at %1$s while another thread is at %2$s.",
++        "Cannot connect to %1$s",
++        "Cannot connect to %1$s - Using %2$s",
++        "%1$s does not support %2$s. Continuing without using %2$s.",
++        "%1$s does not support %2$s for %3$s. Continuing without using %2$s.",
++        "Static %1$s does not support %2$s. Continuing without using %2$s.",
++        "KMP_DYNAMIC_MODE=irml cannot be used with KMP_USE_IRML=0",
++        "ittnotify: Unknown group \"%2$s\" specified in environment variable \"%1$s\".",
++        "ittnotify: Environment variable \"%1$s\" too long: Actual lengths is %2$lu, max allowed length is %3$lu.",
++        "%1$s: Affinity capable, using global cpuid leaf 11 info",
++        "%1$s: Affinity not capable, using local cpuid leaf 11 info",
++        "%1$s: %2$s.",
++        "%1$s: %2$s - %3$s.",
++        "%1$s: OS proc to physical thread map:",
++        "%1$s: using \"flat\" OS <-> physical proc mapping.",
++        "%1$s: parsing %2$s.",
++        "%1$s - exiting.",
++        "Incompatible %1$s library with version %2$s found.",
++        "ittnotify: Function %1$s failed:",
++        "ittnotify: Error #%1$d.",
++        "%1$s must be set prior to first parallel region or certain API calls; ignored.",
++        "Lock initialized at %1$s(%2$d) was not destroyed",
++        "Cannot determine machine load balance - Using %1$s",
++        "%1$s: Affinity not capable, using pthread info",
++        "%1$s: Affinity capable, using pthread info",
++        "Loading \"%1$s\" library failed:",
++        "Lookup of \"%1$s\" function failed:",
++        "Buffer too small.",
++        "Error #%1$d.",
++        "%1$s: Invalid symbols found. Check the value \"%2$s\".",
++        "%1$s: Spaces between digits are not allowed \"%2$s\".",
++        "%1$s: %2$s - parsing %3$s.",
++        "%1$s cannot be specified via kmp_set_defaults() on this machine because it has more than one processor group.",
++        "Cannot use affinity type \"%1$s\" with multiple Windows* OS processor groups, using \"%2$s\".",
++        "Cannot use affinity granularity \"%1$s\" with multiple Windows* OS processor groups, using \"%2$s\".",
++        "%1$s: Mapping Windows* OS processor group <i> proc <j> to OS proc 64*<i>+<j>.",
++        "%1$s: OS proc %2$d maps to Windows* OS processor group %3$d proc %4$d",
++        "%1$s: Affinity balanced is not available.",
++        "%1$s: granularity=core will be used.",
++        "%1$s must be set prior to first OMP lock call or critical section; ignored.",
++        "futex system call not supported; %1$s=%2$s ignored.",
++        "%1$s: granularity=%2$s will be used.",
++        "%1$s: invalid value \"%2$s\", valid format is \"N<item>[@N][,...][,Nt] (<item> can be S, N, L2, C, T  for Socket, NUMA Node, L2 Cache, Core, Thread)\".",
++        "KMP_HW_SUBSET ignored: unsupported architecture.",
++        "KMP_HW_SUBSET ignored: too many cores requested.",
++        "%1$s: syntax error, using %2$s.",
++        "%1$s: Adaptive locks are not supported; using queuing.",
++        "%1$s: Invalid symbols found. Check the value \"%2$s\".",
++        "%1$s: Spaces between digits are not allowed \"%2$s\".",
++        "%1$s: pid %2$d tid %3$d thread %4$d bound to OS proc set %5$s",
++        "%1$s error: parallel loop increment and condition are inconsistent.",
++        "libgomp cancellation is not currently supported.",
++        "KMP_HW_SUBSET ignored: non-uniform topology.",
++        "KMP_HW_SUBSET ignored: only three-level topology is supported.",
++        "%1$s: granularity=%2$s is not supported with KMP_TOPOLOGY_METHOD=group. Using \"granularity=fine\".",
++        "%1$s: granularity=group is not supported with KMP_AFFINITY=%2$s. Using \"granularity=core\".",
++        "KMP_HW_SUBSET ignored: too many sockets requested.",
++        "KMP_HW_SUBSET \"o\" offset designator deprecated, please use @ prefix for offset value.",
++        "%1$s: Affinity capable, using hwloc.",
++        "%1$s: Ignoring hwloc mechanism.",
++        "%1$s: Hwloc failed in %2$s. Relying on internal affinity mechanisms.",
++        "%1$s must be set prior to OpenMP runtime library initialization; ignored.",
++        "You have enabled the use of umonitor/umwait. If the CPU doesn't have that enabled you'll get an illegal instruction exception.",
++        "%1$s variable deprecated, please use %2$s instead.",
++        "KMP_FORCE_REDUCTION: %1$s method is not supported; using critical.",
++        "KMP_HW_SUBSET ignored: unsupported item requested for non-HWLOC topology method (KMP_TOPOLOGY_METHOD)",
++        "KMP_HW_SUBSET ignored: too many NUMA Nodes requested.",
++        "KMP_HW_SUBSET ignored: too many L2 Caches requested.",
++        "KMP_HW_SUBSET ignored: too many Procs requested.",
++        "Hierarchy ignored: unsupported level: %1$s.",
++        "OMP: pid %1$s tid %2$s thread %3$s bound to OS proc set {%4$s}",
++        "%1$s routine deprecated, please use %2$s instead.",
++        "libgomp compatibility layer does not support OpenMP feature: %1$s",
++        "KMP_HW_SUBSET ignored: too many Dies requested.",
++        "%1$s: Affinity capable, using global cpuid leaf %2$d info",
++        "%1$s: Affinity not capable, using local cpuid leaf %2$d info",
++        "%1$s: Affinity not capable, using hwloc.",
++        "%1$s: Encountered user-directed error: %2$s.",
++        "%1$s: Encountered user-directed warning: %2$s.",
++        "Failed to create teams between lower bound (%1$d) and upper bound (%2$d).",
++        "KMP_HW_SUBSET ignored: %1$s: too many requested.",
++        "KMP_HW_SUBSET ignored: %1$s: level not detected in machine topology.",
++        "KMP_HW_SUBSET ignored: %1$s, %2$s: layers are equivalent, please only specify one.",
++        "KMP_HW_SUBSET ignored: %1$s layer should come after %2$s.",
++        "%1$s: topology layer \"%2$s\" is equivalent to \"%3$s\".",
++        "%1$s: granularity=%2$s is too coarse, setting granularity=group.",
++        "%1$s: \"%2$s\" value is deprecated. Please use \"%3$s\" instead.",
++        "num_teams value must be positive, it is %1$d, using %2$d instead.",
++        "KMP_HW_SUBSET ignored: %1$s, %2$s: attributes are ambiguous, please only specify one.",
++        "KMP_HW_SUBSET ignored: %1$s: attribute specified more than once.",
++        "KMP_HW_SUBSET ignored: %1$s: attribute value %2$s is invalid.",
++        "KMP_HW_SUBSET ignored: all hardware resources would be filtered, please reduce the filter.",
++        "KMP_HW_SUBSET ignored: Too many attributes specified. This machine is not a hybrid architecutre.",
++        "KMP_HW_SUBSET: ignoring %1$s attribute. This machine is not a hybrid architecutre.",
++        "Target memory not available, will use default allocator.",
++        NULL
++    };
++
++static char const *
++__kmp_i18n_default_hints[] =
++    {
++        NULL,
++        "Please submit a bug report with this message, compile and run commands used, and machine configuration info including native compiler and operating system versions. Faster response will be obtained by including all program sources. For information on submitting this issue, please see https://bugs.llvm.org/.",
++        "Check NLSPATH environment variable, its value is \"%1$s\".",
++        "Please try changing the shell stack limit or adjusting the OMP_STACKSIZE environment variable.",
++        "Consider unsetting KMP_DEVICE_THREAD_LIMIT (KMP_ALL_THREADS), KMP_TEAMS_THREAD_LIMIT, and OMP_THREAD_LIMIT (if any are set).",
++        "Consider setting KMP_ALL_THREADPRIVATE to a value larger than %1$d.",
++        "This could also be due to a system-related limit on the number of threads.",
++        "This means that multiple copies of the OpenMP runtime have been linked into the program. That is dangerous, since it can degrade performance or cause incorrect results. The best thing to do is to ensure that only a single OpenMP runtime is linked into the process, e.g. by avoiding static linking of the OpenMP runtime in any library. As an unsafe, unsupported, undocumented workaround you can set the environment variable KMP_DUPLICATE_LIB_OK=TRUE to allow the program to continue to execute, but that may cause crashes or silently produce incorrect results. For more information, please see http://openmp.llvm.org/",
++        "This name is specified in environment variable KMP_CPUINFO_FILE.",
++        "Seems application required too much memory.",
++        "Use \"0\", \"FALSE\". \".F.\", \"off\", \"no\" as false values, \"1\", \"TRUE\", \".T.\", \"on\", \"yes\" as true values.",
++        "Perhaps too many threads.",
++        "Decrease priority of application. This will allow the monitor thread run at higher priority than other threads.",
++        "Try changing KMP_MONITOR_STACKSIZE or the shell stack limit.",
++        "Try changing OMP_STACKSIZE and/or the shell stack limit.",
++        "Try increasing OMP_STACKSIZE or the shell stack limit.",
++        "Try decreasing OMP_STACKSIZE.",
++        "Try decreasing the value of OMP_NUM_THREADS.",
++        "Try increasing KMP_MONITOR_STACKSIZE.",
++        "Try decreasing KMP_MONITOR_STACKSIZE.",
++        "Try decreasing the number of threads in use simultaneously.",
++        "Will use default schedule type (%1$s).",
++        "It could be a result of using an older OMP library with a newer compiler or memory corruption. You may check the proper OMP library is linked to the application.",
++        "Check %1$s environment variable, its value is \"%2$s\".",
++        "You may want to use an %1$s library that supports %2$s interface with version %3$s.",
++        "You may want to use an %1$s library with version %2$s.",
++        "System error #193 is \"Bad format of EXE or DLL file\". Usually it means the file is found, but it is corrupted or a file for another architecture. Check whether \"%1$s\" is a file for %2$s architecture.",
++        "System-related limit on the number of threads.",
++        "Try setting new bounds (preferably less than or equal to %1$d) for num_teams clause.",
++        "Valid values are from %1$d to %2$d.",
++        NULL
++    };
++
++struct kmp_i18n_section {
++    int           size;
++    char const ** str;
++}; // struct kmp_i18n_section
++typedef struct kmp_i18n_section  kmp_i18n_section_t;
++
++static kmp_i18n_section_t
++__kmp_i18n_sections[] =
++    {
++        { 0, NULL },
++        { 5, __kmp_i18n_default_meta },
++        { 79, __kmp_i18n_default_strings },
++        { 6, __kmp_i18n_default_formats },
++        { 299, __kmp_i18n_default_messages },
++        { 29, __kmp_i18n_default_hints },
++        { 0, NULL }
++    };
++
++struct kmp_i18n_table {
++    int                   size;
++    kmp_i18n_section_t *  sect;
++}; // struct kmp_i18n_table
++typedef struct kmp_i18n_table  kmp_i18n_table_t;
++
++static kmp_i18n_table_t __kmp_i18n_default_table =
++    {
++        5,
++        __kmp_i18n_sections
++    };
++
++// end of file //
+diff --git a/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_id.inc b/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_id.inc
+new file mode 100644
+index 000000000000..0724ca20a7bc
+--- /dev/null
++++ b/utils/bazel/llvm-project-overlay/openmp/runtime/src/kmp_i18n_id.inc
+@@ -0,0 +1,454 @@
++// Do not edit this file! //
++// Generated statically as part of rules_ll.
++
++enum kmp_i18n_id {
++
++    // A special id for absence of message.
++    kmp_i18n_null = 0,
++
++    // Set #1, meta.
++    kmp_i18n_prp_first = 65536,
++    kmp_i18n_prp_Language,
++    kmp_i18n_prp_Country,
++    kmp_i18n_prp_LangId,
++    kmp_i18n_prp_Version,
++    kmp_i18n_prp_Revision,
++    kmp_i18n_prp_last,
++
++    // Set #2, strings.
++    kmp_i18n_str_first = 131072,
++    kmp_i18n_str_Error,
++    kmp_i18n_str_UnknownFile,
++    kmp_i18n_str_NotANumber,
++    kmp_i18n_str_BadUnit,
++    kmp_i18n_str_IllegalCharacters,
++    kmp_i18n_str_ValueTooLarge,
++    kmp_i18n_str_ValueTooSmall,
++    kmp_i18n_str_NotMultiple4K,
++    kmp_i18n_str_UnknownTopology,
++    kmp_i18n_str_CantOpenCpuinfo,
++    kmp_i18n_str_ProcCpuinfo,
++    kmp_i18n_str_NoProcRecords,
++    kmp_i18n_str_TooManyProcRecords,
++    kmp_i18n_str_CantRewindCpuinfo,
++    kmp_i18n_str_LongLineCpuinfo,
++    kmp_i18n_str_TooManyEntries,
++    kmp_i18n_str_MissingProcField,
++    kmp_i18n_str_MissingPhysicalIDField,
++    kmp_i18n_str_MissingValCpuinfo,
++    kmp_i18n_str_DuplicateFieldCpuinfo,
++    kmp_i18n_str_PhysicalIDsNotUnique,
++    kmp_i18n_str_ApicNotPresent,
++    kmp_i18n_str_InvalidCpuidInfo,
++    kmp_i18n_str_OBSOLETE1,
++    kmp_i18n_str_InconsistentCpuidInfo,
++    kmp_i18n_str_OutOfHeapMemory,
++    kmp_i18n_str_MemoryAllocFailed,
++    kmp_i18n_str_Core,
++    kmp_i18n_str_Thread,
++    kmp_i18n_str_Package,
++    kmp_i18n_str_Node,
++    kmp_i18n_str_OBSOLETE2,
++    kmp_i18n_str_DecodingLegacyAPIC,
++    kmp_i18n_str_OBSOLETE3,
++    kmp_i18n_str_NotDefined,
++    kmp_i18n_str_EffectiveSettings,
++    kmp_i18n_str_UserSettings,
++    kmp_i18n_str_StorageMapWarning,
++    kmp_i18n_str_OBSOLETE4,
++    kmp_i18n_str_OBSOLETE5,
++    kmp_i18n_str_OBSOLETE6,
++    kmp_i18n_str_OBSOLETE7,
++    kmp_i18n_str_OBSOLETE8,
++    kmp_i18n_str_Decodingx2APIC,
++    kmp_i18n_str_NoLeaf11Support,
++    kmp_i18n_str_NoLeaf4Support,
++    kmp_i18n_str_ThreadIDsNotUnique,
++    kmp_i18n_str_UsingPthread,
++    kmp_i18n_str_LegacyApicIDsNotUnique,
++    kmp_i18n_str_x2ApicIDsNotUnique,
++    kmp_i18n_str_DisplayEnvBegin,
++    kmp_i18n_str_DisplayEnvEnd,
++    kmp_i18n_str_Device,
++    kmp_i18n_str_Host,
++    kmp_i18n_str_Tile,
++    kmp_i18n_str_Tiles,
++    kmp_i18n_str_Threads,
++    kmp_i18n_str_Cores,
++    kmp_i18n_str_Socket,
++    kmp_i18n_str_Sockets,
++    kmp_i18n_str_Die,
++    kmp_i18n_str_Dice,
++    kmp_i18n_str_Module,
++    kmp_i18n_str_Modules,
++    kmp_i18n_str_L1Cache,
++    kmp_i18n_str_L1Caches,
++    kmp_i18n_str_L2Cache,
++    kmp_i18n_str_L2Caches,
++    kmp_i18n_str_L3Cache,
++    kmp_i18n_str_L3Caches,
++    kmp_i18n_str_NumaDomain,
++    kmp_i18n_str_NumaDomains,
++    kmp_i18n_str_ProcGroup,
++    kmp_i18n_str_ProcGroups,
++    kmp_i18n_str_Unknown,
++    kmp_i18n_str_NoLeaf31Support,
++    kmp_i18n_str_HwlocFailed,
++    kmp_i18n_str_LLCache,
++    kmp_i18n_str_LLCaches,
++    kmp_i18n_str_last,
++
++    // Set #3, formats.
++    kmp_i18n_fmt_first = 196608,
++    kmp_i18n_fmt_Info,
++    kmp_i18n_fmt_Warning,
++    kmp_i18n_fmt_Fatal,
++    kmp_i18n_fmt_SysErr,
++    kmp_i18n_fmt_Hint,
++    kmp_i18n_fmt_Pragma,
++    kmp_i18n_fmt_last,
++
++    // Set #4, messages.
++    kmp_i18n_msg_first = 262144,
++    kmp_i18n_msg_LibraryIsSerial,
++    kmp_i18n_msg_CantOpenMessageCatalog,
++    kmp_i18n_msg_WillUseDefaultMessages,
++    kmp_i18n_msg_LockIsUninitialized,
++    kmp_i18n_msg_LockSimpleUsedAsNestable,
++    kmp_i18n_msg_LockNestableUsedAsSimple,
++    kmp_i18n_msg_LockIsAlreadyOwned,
++    kmp_i18n_msg_LockStillOwned,
++    kmp_i18n_msg_LockUnsettingFree,
++    kmp_i18n_msg_LockUnsettingSetByAnother,
++    kmp_i18n_msg_StackOverflow,
++    kmp_i18n_msg_StackOverlap,
++    kmp_i18n_msg_AssertionFailure,
++    kmp_i18n_msg_CantRegisterNewThread,
++    kmp_i18n_msg_DuplicateLibrary,
++    kmp_i18n_msg_CantOpenFileForReading,
++    kmp_i18n_msg_CantGetEnvVar,
++    kmp_i18n_msg_CantSetEnvVar,
++    kmp_i18n_msg_CantGetEnvironment,
++    kmp_i18n_msg_BadBoolValue,
++    kmp_i18n_msg_SSPNotBuiltIn,
++    kmp_i18n_msg_SPPSotfTerminateFailed,
++    kmp_i18n_msg_BufferOverflow,
++    kmp_i18n_msg_RealTimeSchedNotSupported,
++    kmp_i18n_msg_RunningAtMaxPriority,
++    kmp_i18n_msg_CantChangeMonitorPriority,
++    kmp_i18n_msg_MonitorWillStarve,
++    kmp_i18n_msg_CantSetMonitorStackSize,
++    kmp_i18n_msg_CantSetWorkerStackSize,
++    kmp_i18n_msg_CantInitThreadAttrs,
++    kmp_i18n_msg_CantDestroyThreadAttrs,
++    kmp_i18n_msg_CantSetWorkerState,
++    kmp_i18n_msg_CantSetMonitorState,
++    kmp_i18n_msg_NoResourcesForWorkerThread,
++    kmp_i18n_msg_NoResourcesForMonitorThread,
++    kmp_i18n_msg_CantTerminateWorkerThread,
++    kmp_i18n_msg_ScheduleKindOutOfRange,
++    kmp_i18n_msg_UnknownSchedulingType,
++    kmp_i18n_msg_InvalidValue,
++    kmp_i18n_msg_SmallValue,
++    kmp_i18n_msg_LargeValue,
++    kmp_i18n_msg_StgInvalidValue,
++    kmp_i18n_msg_BarrReleaseValueInvalid,
++    kmp_i18n_msg_BarrGatherValueInvalid,
++    kmp_i18n_msg_OBSOLETE9,
++    kmp_i18n_msg_ParRangeSyntax,
++    kmp_i18n_msg_UnbalancedQuotes,
++    kmp_i18n_msg_EmptyString,
++    kmp_i18n_msg_LongValue,
++    kmp_i18n_msg_InvalidClause,
++    kmp_i18n_msg_EmptyClause,
++    kmp_i18n_msg_InvalidChunk,
++    kmp_i18n_msg_LargeChunk,
++    kmp_i18n_msg_IgnoreChunk,
++    kmp_i18n_msg_CantGetProcFreq,
++    kmp_i18n_msg_EnvParallelWarn,
++    kmp_i18n_msg_AffParamDefined,
++    kmp_i18n_msg_AffInvalidParam,
++    kmp_i18n_msg_AffManyParams,
++    kmp_i18n_msg_AffManyParamsForLogic,
++    kmp_i18n_msg_AffNoParam,
++    kmp_i18n_msg_AffNoProcList,
++    kmp_i18n_msg_AffProcListNoType,
++    kmp_i18n_msg_AffProcListNotExplicit,
++    kmp_i18n_msg_AffSyntaxError,
++    kmp_i18n_msg_AffZeroStride,
++    kmp_i18n_msg_AffStartGreaterEnd,
++    kmp_i18n_msg_AffStrideLessZero,
++    kmp_i18n_msg_AffRangeTooBig,
++    kmp_i18n_msg_OBSOLETE10,
++    kmp_i18n_msg_AffNotSupported,
++    kmp_i18n_msg_OBSOLETE11,
++    kmp_i18n_msg_GetAffSysCallNotSupported,
++    kmp_i18n_msg_SetAffSysCallNotSupported,
++    kmp_i18n_msg_OBSOLETE12,
++    kmp_i18n_msg_OBSOLETE13,
++    kmp_i18n_msg_OBSOLETE14,
++    kmp_i18n_msg_OBSOLETE15,
++    kmp_i18n_msg_AffCantGetMaskSize,
++    kmp_i18n_msg_ParseSizeIntWarn,
++    kmp_i18n_msg_ParseExtraCharsWarn,
++    kmp_i18n_msg_UnknownForceReduction,
++    kmp_i18n_msg_TimerUseGettimeofday,
++    kmp_i18n_msg_TimerNeedMoreParam,
++    kmp_i18n_msg_TimerInvalidParam,
++    kmp_i18n_msg_TimerGettimeFailed,
++    kmp_i18n_msg_TimerUnknownFunction,
++    kmp_i18n_msg_UnknownSchedTypeDetected,
++    kmp_i18n_msg_DispatchManyThreads,
++    kmp_i18n_msg_IttLookupFailed,
++    kmp_i18n_msg_IttLoadLibFailed,
++    kmp_i18n_msg_IttAllNotifDisabled,
++    kmp_i18n_msg_IttObjNotifDisabled,
++    kmp_i18n_msg_IttMarkNotifDisabled,
++    kmp_i18n_msg_IttUnloadLibFailed,
++    kmp_i18n_msg_CantFormThrTeam,
++    kmp_i18n_msg_ActiveLevelsNegative,
++    kmp_i18n_msg_ActiveLevelsExceedLimit,
++    kmp_i18n_msg_SetLibraryIncorrectCall,
++    kmp_i18n_msg_FatalSysError,
++    kmp_i18n_msg_OutOfHeapMemory,
++    kmp_i18n_msg_OBSOLETE16,
++    kmp_i18n_msg_OBSOLETE17,
++    kmp_i18n_msg_Using_int_Value,
++    kmp_i18n_msg_Using_uint_Value,
++    kmp_i18n_msg_Using_uint64_Value,
++    kmp_i18n_msg_Using_str_Value,
++    kmp_i18n_msg_BarrierPatternOverride,
++    kmp_i18n_msg_MaxValueUsing,
++    kmp_i18n_msg_MinValueUsing,
++    kmp_i18n_msg_MemoryAllocFailed,
++    kmp_i18n_msg_FileNameTooLong,
++    kmp_i18n_msg_OBSOLETE18,
++    kmp_i18n_msg_ManyThreadsForTPDirective,
++    kmp_i18n_msg_AffinityInvalidMask,
++    kmp_i18n_msg_WrongDefinition,
++    kmp_i18n_msg_TLSSetValueFailed,
++    kmp_i18n_msg_TLSOutOfIndexes,
++    kmp_i18n_msg_OBSOLETE19,
++    kmp_i18n_msg_CantGetNumAvailCPU,
++    kmp_i18n_msg_AssumedNumCPU,
++    kmp_i18n_msg_ErrorInitializeAffinity,
++    kmp_i18n_msg_AffThreadsMayMigrate,
++    kmp_i18n_msg_AffIgnoreInvalidProcID,
++    kmp_i18n_msg_AffNoValidProcID,
++    kmp_i18n_msg_UsingFlatOS,
++    kmp_i18n_msg_UsingFlatOSFile,
++    kmp_i18n_msg_UsingFlatOSFileLine,
++    kmp_i18n_msg_FileMsgExiting,
++    kmp_i18n_msg_FileLineMsgExiting,
++    kmp_i18n_msg_ConstructIdentInvalid,
++    kmp_i18n_msg_ThreadIdentInvalid,
++    kmp_i18n_msg_RTLNotInitialized,
++    kmp_i18n_msg_TPCommonBlocksInconsist,
++    kmp_i18n_msg_CantSetThreadAffMask,
++    kmp_i18n_msg_CantSetThreadPriority,
++    kmp_i18n_msg_CantCreateThread,
++    kmp_i18n_msg_CantCreateEvent,
++    kmp_i18n_msg_CantSetEvent,
++    kmp_i18n_msg_CantCloseHandle,
++    kmp_i18n_msg_UnknownLibraryType,
++    kmp_i18n_msg_ReapMonitorError,
++    kmp_i18n_msg_ReapWorkerError,
++    kmp_i18n_msg_ChangeThreadAffMaskError,
++    kmp_i18n_msg_ThreadsMigrate,
++    kmp_i18n_msg_DecreaseToThreads,
++    kmp_i18n_msg_IncreaseToThreads,
++    kmp_i18n_msg_OBSOLETE20,
++    kmp_i18n_msg_AffCapableUseCpuinfo,
++    kmp_i18n_msg_AffUseGlobCpuid,
++    kmp_i18n_msg_AffCapableUseFlat,
++    kmp_i18n_msg_AffNotCapableUseLocCpuid,
++    kmp_i18n_msg_AffNotCapableUseCpuinfo,
++    kmp_i18n_msg_AffFlatTopology,
++    kmp_i18n_msg_InitOSProcSetRespect,
++    kmp_i18n_msg_InitOSProcSetNotRespect,
++    kmp_i18n_msg_AvailableOSProc,
++    kmp_i18n_msg_Uniform,
++    kmp_i18n_msg_NonUniform,
++    kmp_i18n_msg_Topology,
++    kmp_i18n_msg_OBSOLETE21,
++    kmp_i18n_msg_OSProcToPackage,
++    kmp_i18n_msg_OBSOLETE22,
++    kmp_i18n_msg_OBSOLETE23,
++    kmp_i18n_msg_OBSOLETE24,
++    kmp_i18n_msg_OBSOLETE25,
++    kmp_i18n_msg_OBSOLETE26,
++    kmp_i18n_msg_OBSOLETE27,
++    kmp_i18n_msg_OBSOLETE28,
++    kmp_i18n_msg_OBSOLETE29,
++    kmp_i18n_msg_OBSOLETE30,
++    kmp_i18n_msg_OSProcMapToPack,
++    kmp_i18n_msg_OBSOLETE31,
++    kmp_i18n_msg_OBSOLETE32,
++    kmp_i18n_msg_OBSOLETE33,
++    kmp_i18n_msg_OBSOLETE34,
++    kmp_i18n_msg_OBSOLETE35,
++    kmp_i18n_msg_BarriersInDifferentOrder,
++    kmp_i18n_msg_FunctionError,
++    kmp_i18n_msg_TopologyExtra,
++    kmp_i18n_msg_WrongMessageCatalog,
++    kmp_i18n_msg_StgIgnored,
++    kmp_i18n_msg_OBSOLETE36,
++    kmp_i18n_msg_AffTilesNoHWLOC,
++    kmp_i18n_msg_AffTilesNoTiles,
++    kmp_i18n_msg_TopologyExtraTile,
++    kmp_i18n_msg_TopologyExtraNode,
++    kmp_i18n_msg_TopologyExtraNoTi,
++    kmp_i18n_msg_OmptOutdatedWorkshare,
++    kmp_i18n_msg_OmpNoAllocator,
++    kmp_i18n_msg_TopologyGeneric,
++    kmp_i18n_msg_AffGranularityBad,
++    kmp_i18n_msg_TopologyHybrid,
++    kmp_i18n_msg_TopologyHybridCoreEff,
++    kmp_i18n_msg_CnsBoundToWorksharing,
++    kmp_i18n_msg_CnsDetectedEnd,
++    kmp_i18n_msg_CnsIterationRangeTooLarge,
++    kmp_i18n_msg_CnsLoopIncrZeroProhibited,
++    kmp_i18n_msg_CnsExpectedEnd,
++    kmp_i18n_msg_CnsInvalidNesting,
++    kmp_i18n_msg_CnsMultipleNesting,
++    kmp_i18n_msg_CnsNestingSameName,
++    kmp_i18n_msg_CnsNoOrderedClause,
++    kmp_i18n_msg_CnsNotInTaskConstruct,
++    kmp_i18n_msg_CnsThreadsAtBarrier,
++    kmp_i18n_msg_CantConnect,
++    kmp_i18n_msg_CantConnectUsing,
++    kmp_i18n_msg_LibNotSupport,
++    kmp_i18n_msg_LibNotSupportFor,
++    kmp_i18n_msg_StaticLibNotSupport,
++    kmp_i18n_msg_OBSOLETE37,
++    kmp_i18n_msg_IttUnknownGroup,
++    kmp_i18n_msg_IttEnvVarTooLong,
++    kmp_i18n_msg_OBSOLETE38,
++    kmp_i18n_msg_OBSOLETE39,
++    kmp_i18n_msg_AffInfoStr,
++    kmp_i18n_msg_AffInfoStrStr,
++    kmp_i18n_msg_OSProcToPhysicalThreadMap,
++    kmp_i18n_msg_AffUsingFlatOS,
++    kmp_i18n_msg_AffParseFilename,
++    kmp_i18n_msg_MsgExiting,
++    kmp_i18n_msg_IncompatibleLibrary,
++    kmp_i18n_msg_IttFunctionError,
++    kmp_i18n_msg_IttUnknownError,
++    kmp_i18n_msg_EnvMiddleWarn,
++    kmp_i18n_msg_CnsLockNotDestroyed,
++    kmp_i18n_msg_CantLoadBalUsing,
++    kmp_i18n_msg_AffNotCapableUsePthread,
++    kmp_i18n_msg_AffUsePthread,
++    kmp_i18n_msg_OBSOLETE40,
++    kmp_i18n_msg_OBSOLETE41,
++    kmp_i18n_msg_OBSOLETE42,
++    kmp_i18n_msg_OBSOLETE43,
++    kmp_i18n_msg_NthSyntaxError,
++    kmp_i18n_msg_NthSpacesNotAllowed,
++    kmp_i18n_msg_AffStrParseFilename,
++    kmp_i18n_msg_OBSOLETE44,
++    kmp_i18n_msg_AffTypeCantUseMultGroups,
++    kmp_i18n_msg_AffGranCantUseMultGroups,
++    kmp_i18n_msg_AffWindowsProcGroupMap,
++    kmp_i18n_msg_AffOSProcToGroup,
++    kmp_i18n_msg_AffBalancedNotAvail,
++    kmp_i18n_msg_OBSOLETE45,
++    kmp_i18n_msg_EnvLockWarn,
++    kmp_i18n_msg_FutexNotSupported,
++    kmp_i18n_msg_AffGranUsing,
++    kmp_i18n_msg_AffHWSubsetInvalid,
++    kmp_i18n_msg_AffHWSubsetUnsupported,
++    kmp_i18n_msg_AffHWSubsetManyCores,
++    kmp_i18n_msg_SyntaxErrorUsing,
++    kmp_i18n_msg_AdaptiveNotSupported,
++    kmp_i18n_msg_EnvSyntaxError,
++    kmp_i18n_msg_EnvSpacesNotAllowed,
++    kmp_i18n_msg_BoundToOSProcSet,
++    kmp_i18n_msg_CnsLoopIncrIllegal,
++    kmp_i18n_msg_NoGompCancellation,
++    kmp_i18n_msg_AffHWSubsetNonUniform,
++    kmp_i18n_msg_AffHWSubsetNonThreeLevel,
++    kmp_i18n_msg_AffGranTopGroup,
++    kmp_i18n_msg_AffGranGroupType,
++    kmp_i18n_msg_AffHWSubsetManySockets,
++    kmp_i18n_msg_AffHWSubsetDeprecated,
++    kmp_i18n_msg_AffUsingHwloc,
++    kmp_i18n_msg_AffIgnoringHwloc,
++    kmp_i18n_msg_AffHwlocErrorOccurred,
++    kmp_i18n_msg_EnvSerialWarn,
++    kmp_i18n_msg_EnvMwaitWarn,
++    kmp_i18n_msg_EnvVarDeprecated,
++    kmp_i18n_msg_RedMethodNotSupported,
++    kmp_i18n_msg_AffHWSubsetNoHWLOC,
++    kmp_i18n_msg_AffHWSubsetManyNodes,
++    kmp_i18n_msg_AffHWSubsetManyTiles,
++    kmp_i18n_msg_AffHWSubsetManyProcs,
++    kmp_i18n_msg_HierSchedInvalid,
++    kmp_i18n_msg_AffFormatDefault,
++    kmp_i18n_msg_APIDeprecated,
++    kmp_i18n_msg_GompFeatureNotSupported,
++    kmp_i18n_msg_AffHWSubsetManyDies,
++    kmp_i18n_msg_AffUseGlobCpuidL,
++    kmp_i18n_msg_AffNotCapableUseLocCpuidL,
++    kmp_i18n_msg_AffNotUsingHwloc,
++    kmp_i18n_msg_UserDirectedError,
++    kmp_i18n_msg_UserDirectedWarning,
++    kmp_i18n_msg_FailedToCreateTeam,
++    kmp_i18n_msg_AffHWSubsetManyGeneric,
++    kmp_i18n_msg_AffHWSubsetNotExistGeneric,
++    kmp_i18n_msg_AffHWSubsetEqvLayers,
++    kmp_i18n_msg_AffHWSubsetOutOfOrder,
++    kmp_i18n_msg_AffEqualTopologyTypes,
++    kmp_i18n_msg_AffGranTooCoarseProcGroup,
++    kmp_i18n_msg_StgDeprecatedValue,
++    kmp_i18n_msg_NumTeamsNotPositive,
++    kmp_i18n_msg_AffHWSubsetIncompat,
++    kmp_i18n_msg_AffHWSubsetAttrRepeat,
++    kmp_i18n_msg_AffHWSubsetAttrInvalid,
++    kmp_i18n_msg_AffHWSubsetAllFiltered,
++    kmp_i18n_msg_AffHWSubsetAttrsNonHybrid,
++    kmp_i18n_msg_AffHWSubsetIgnoringAttr,
++    kmp_i18n_msg_TargetMemNotAvailable,
++    kmp_i18n_msg_last,
++
++    // Set #5, hints.
++    kmp_i18n_hnt_first = 327680,
++    kmp_i18n_hnt_SubmitBugReport,
++    kmp_i18n_hnt_OBSOLETE46,
++    kmp_i18n_hnt_ChangeStackLimit,
++    kmp_i18n_hnt_Unset_ALL_THREADS,
++    kmp_i18n_hnt_Set_ALL_THREADPRIVATE,
++    kmp_i18n_hnt_PossibleSystemLimitOnThreads,
++    kmp_i18n_hnt_DuplicateLibrary,
++    kmp_i18n_hnt_NameComesFrom_CPUINFO_FILE,
++    kmp_i18n_hnt_NotEnoughMemory,
++    kmp_i18n_hnt_ValidBoolValues,
++    kmp_i18n_hnt_BufferOverflow,
++    kmp_i18n_hnt_RunningAtMaxPriority,
++    kmp_i18n_hnt_ChangeMonitorStackSize,
++    kmp_i18n_hnt_ChangeWorkerStackSize,
++    kmp_i18n_hnt_IncreaseWorkerStackSize,
++    kmp_i18n_hnt_DecreaseWorkerStackSize,
++    kmp_i18n_hnt_Decrease_NUM_THREADS,
++    kmp_i18n_hnt_IncreaseMonitorStackSize,
++    kmp_i18n_hnt_DecreaseMonitorStackSize,
++    kmp_i18n_hnt_DecreaseNumberOfThreadsInUse,
++    kmp_i18n_hnt_DefaultScheduleKindUsed,
++    kmp_i18n_hnt_GetNewerLibrary,
++    kmp_i18n_hnt_CheckEnvVar,
++    kmp_i18n_hnt_OBSOLETE47,
++    kmp_i18n_hnt_OBSOLETE48,
++    kmp_i18n_hnt_BadExeFormat,
++    kmp_i18n_hnt_SystemLimitOnThreads,
++    kmp_i18n_hnt_SetNewBound,
++    kmp_i18n_hnt_ValidValuesRange,
++    kmp_i18n_hnt_last,
++
++    kmp_i18n_xxx_lastest
++
++}; // enum kmp_i18n_id
++
++typedef enum kmp_i18n_id  kmp_i18n_id_t;
++
++
++// end of file //
