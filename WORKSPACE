@@ -16,16 +16,17 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "6009708b4367171ccdbf4b5905cb6a803753fe18"  # 17.0.6
-
-LLVM_SHA256 = "1b0dd2e445ebe7406f4982cb39de02f8c07f19e6ef2182e49164d9e6421dc9ec"
+LLVM_COMMIT = "26a1d6601d727a96f4301d0d8647b5a42760ae0c"  # 18.1.2
 
 http_archive(
     name = "llvm-raw",
     build_file = "//:BUILD.llvm-raw",
+    integrity = "sha256-KsQDkrF6dGhV2l68+BhEu26+Qvp1f7HaRnLnqiglfPM=",
     patch_args = ["-p1"],
-    patches = ["//:llvm.patch"],
-    sha256 = LLVM_SHA256,
+    patches = [
+        "//:llvm.patch",
+        "//:fix_RISCVGenMacroFusion_build.patch",
+    ],
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
 )
