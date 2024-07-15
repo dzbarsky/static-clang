@@ -59,7 +59,7 @@ cmake(
     working_directory = "llvm",
     build_args = ["-j10"],
     generate_args = [
-        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_BUILD_TYPE=Release",
         "-DLLVM_ENABLE_RUNTIMES=libunwind",
     ],
     postfix_script = """\
