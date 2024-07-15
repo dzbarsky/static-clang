@@ -55,6 +55,7 @@ DIST_FLAVORS = {
             ":bins" + suffix,
             "//:builtin_headers_pkg_files",
             "@llvm-raw//:libcxx_include",
+            "@llvm-raw//:unwind",
         ],
         empty_files = props.get("extra_empty_files", []),
         extension = ".tar.xz",

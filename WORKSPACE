@@ -16,6 +16,17 @@ http_archive(
     ],
 )
 
+FOREIGN_CC_VERSION = "0.9.0"
+
+http_archive(
+    name = "rules_foreign_cc",
+    sha256 = "",
+    strip_prefix = "rules_foreign_cc-{version}".format(version = FOREIGN_CC_VERSION),
+    url = "https://github.com/bazelbuild/rules_foreign_cc/archive/{version}.tar.gz".format(version = FOREIGN_CC_VERSION),
+)
+load("@rules_foreign_cc//foreign_cc:repositories.bzl", "rules_foreign_cc_dependencies")
+rules_foreign_cc_dependencies()
+
 LLVM_COMMIT = "26a1d6601d727a96f4301d0d8647b5a42760ae0c"  # 18.1.2
 
 http_archive(
