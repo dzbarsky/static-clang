@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "cmake")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 
@@ -45,4 +46,26 @@ pkg_files(
     ],
     strip_prefix = "libcxx/include",
     prefix = "include/c++/v1",
+)
+
+filegroup(
+    name = "llvm_srcs",
+    srcs = glob(["**"]),
+)
+
+cmake(
+    name = "unwind",
+    lib_source = ":llvm_srcs",
+    working_directory = "llvm",
+    build_args = ["-j10"],
+    generate_args = [
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DLLVM_ENABLE_RUNTIMES=libunwind",
+    ],
+    postfix_script = """\
+cp ${BUILD_TMPDIR}/lib/libunwind.a ${INSTALLDIR}/lib
+    """,
+    targets = ["unwind"],
+    out_static_libs = ["libunwind.a"],
+    install = False,
 )
