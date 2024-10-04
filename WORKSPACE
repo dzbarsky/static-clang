@@ -26,6 +26,7 @@ http_archive(
     patches = [
         "//:llvm.patch",
         "//:fix_RISCVGenMacroFusion_build.patch",
+        "//:fix_compiler_rt.patch",
     ],
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
