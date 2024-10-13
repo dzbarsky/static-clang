@@ -27,10 +27,16 @@ http_archive(
         "//:llvm.patch",
         "//:fix_RISCVGenMacroFusion_build.patch",
         "//:fix_compiler_rt.patch",
+        "//:libunwind.patch",
     ],
     strip_prefix = "llvm-project-" + LLVM_COMMIT,
     urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],
 )
+#new_local_repository(
+#    name = "llvm-raw",
+#    build_file = "//:BUILD.llvm-raw",
+#    path = "../llvm-project",
+#)
 
 load("@llvm-raw//utils/bazel:configure.bzl", "llvm_configure")
 

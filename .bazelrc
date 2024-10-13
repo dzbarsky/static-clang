@@ -10,7 +10,7 @@ common --nobuild_runfile_links
 common --remote_timeout=3600
 common --remote_executor=grpcs://remote.buildbuddy.io
 common --noexperimental_throttle_remote_action_building
-common --jobs=500
+common --jobs=1000
 
 common --extra_execution_platforms=//rbe_platform
 common --host_platform=//rbe_platform

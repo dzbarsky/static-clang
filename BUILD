@@ -1,8 +1,8 @@
 load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
 load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@llvm-project//:vars.bzl", "LLVM_VERSION_MAJOR")
-load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_attributes", "pkg_files")
+load("@rules_pkg//pkg:pkg.bzl", "pkg_tar")
 
 pkg_files(
     name = "builtin_headers_pkg_files",
