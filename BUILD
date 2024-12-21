@@ -65,28 +65,26 @@ pkg_files(
 )
 
 copy_file(
-    name = "copy_libclang_rt.profile_linux_aarch64",
+    name = "copy_libclang_rt.profile_aarch64",
     src = "@llvm-project//compiler-rt:profile",
-    out = "libclang_rt.profile_linux-aarch64.a",
+    out = "libclang_rt.profile-aarch64.a",
 )
 
 pkg_files(
-    name = "libclang_rt.profile_linux_aarch64",
-    srcs = ["libclang_rt.profile_linux-aarch64.a"],
+    name = "libclang_rt.profile_aarch64",
+    srcs = ["libclang_rt.profile-aarch64.a"],
     prefix = LIB_PREFIX + "linux",
 )
 
-# TODO(zbarsky): Not sure if this is the right name.
-# Hopefully someone yells at me if it's wrong.
 copy_file(
-    name = "copy_libclang_rt.profile_linux_x84_64",
+    name = "copy_libclang_rt.profile_x84_64",
     src = "@llvm-project//compiler-rt:profile",
-    out = "libclang_rt.profile_linux-x86_64.a",
+    out = "libclang_rt.profile-x86_64.a",
 )
 
 pkg_files(
-    name = "libclang_rt.profile_linux_x86_64",
-    srcs = ["libclang_rt.profile_linux-x86_64.a"],
+    name = "libclang_rt.profile_x86_64",
+    srcs = ["libclang_rt.profile-x86_64.a"],
     prefix = LIB_PREFIX + "linux",
 )
 
@@ -99,8 +97,8 @@ pkg_files(
             "@llvm-raw//:libcxx_include",
         ] + select({
             "@bazel_tools//src/conditions:darwin": [":libclang_rt.profile_osx"],
-            "@bazel_tools//src/conditions:linux_aarch64": [":libclang_rt.profile_linux_aarch64"],
-            "@bazel_tools//src/conditions:linux_x86_64": [":libclang_rt.profile_linux_x86_64"],
+            "@bazel_tools//src/conditions:linux_aarch64": [":libclang_rt.profile_aarch64"],
+            "@bazel_tools//src/conditions:linux_x86_64": [":libclang_rt.profile_x86_64"],
         }),
         empty_files = props.get("extra_empty_files", []),
         extension = ".tar.xz",
