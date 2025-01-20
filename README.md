@@ -1,4 +1,4 @@
-This repository builds a custom LLVM distribution that comes with statically linked tools (clang, lld, llvm-ar, llvm-as, llvm-nm, llvm-objcopy). This is the minimum set needed to use the outputs as a Bazel cc toolchain with https://github.com/grailbio/bazel-toolchain.
+This repository builds a custom LLVM distribution that comes with statically linked tools (clang, lld, llvm-ar, llvm-as, llvm-nm, llvm-objcopy). This is the minimum set needed to use the outputs as a Bazel cc toolchain with [toolchains_llvm](https://github.com/bazel-contrib/toolchains_llvm) (previously grailbio/bazel-toolchain).
 
 ### Linux
 On Linux, we link against musl libc.
