@@ -8,6 +8,7 @@ On OSX, fully statically linked executable is impossible. We dynamically link on
 
 ## Usage
 The easiest way to consume this is to check the [releases](https://github.com/dzbarsky/static-clang/releases) page for pre-built artifacts.
+See [the example in toolchains_llvm](https://github.com/bazel-contrib/toolchains_llvm/blob/b3c96d2dbc698eab752366bbe747e2a7df7fa504/tests/MODULE.bazel#L97-L121) for where the artifact URLs should be configured.
 
 ### Building from source
 You can also compile from source as follows:
