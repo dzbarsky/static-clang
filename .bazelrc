@@ -18,6 +18,9 @@ common --host_platform=//rbe_platform
 common --platforms @zig_sdk//libc_aware/platform:linux_amd64_musl
 common --experimental_platform_in_output_dir
 
+# LLVM-18 has empty globs
+common --noincompatible_disallow_empty_glob
+
 common --incompatible_enable_cc_toolchain_resolution
 common --repo_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 common --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
