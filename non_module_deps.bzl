@@ -1,14 +1,15 @@
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-LLVM_COMMIT = "cd708029e0b2869e80abe31ddb175f7c35361f90"  # 19.1.6
+LLVM_COMMIT = "424c2d9b7e4de40d0804dd374721e6411c27d1d1"  # 20.1.1
 
 def _non_module_deps_impl(mctx):
     http_archive(
         name = "llvm-raw",
         build_file = "//:BUILD.llvm-raw",
-        integrity = "sha256-BebX/m0YjdTTO4EqtcznZUuIa3yc5AWqHZQshmu+lZ8=",
+        integrity = "sha256-dUf8COu3EzSNHMcVHPatrCy1wu4KFe4mmT03yzLUFQQ=",
         patch_args = ["-p1"],
         patches = [
+            "//:llvm-267e293510ad0e273443bc1b6c3655f6307e3992.patch",
             "//:llvm.patch",
             "//:fix_compiler_rt.patch",
             "//:libunwind.patch",
