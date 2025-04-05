@@ -16,13 +16,13 @@ http_archive(
     ],
 )
 
-LLVM_COMMIT = "26a1d6601d727a96f4301d0d8647b5a42760ae0c"  # 18.1.2
+#LLVM_COMMIT = "26a1d6601d727a96f4301d0d8647b5a42760ae0c"  # 18.1.2
+LLVM_COMMIT = "3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff"
 
 http_archive(
     name = "llvm-raw",
     build_file = "//:BUILD.llvm-raw",
-    integrity = "sha256-KsQDkrF6dGhV2l68+BhEu26+Qvp1f7HaRnLnqiglfPM=",
-    patch_args = ["-p1"],
+    integrity = "sha256-weK03Fabms3opqym+k9TwZedcSLTf0ZcYKY/XQDAIf4=",
     patches = [
         "//:llvm.patch",
         "//:fix_RISCVGenMacroFusion_build.patch",
