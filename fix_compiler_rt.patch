@@ -1,14 +1,8 @@
-commit 2b7a01e90d9de4ed3a6c1e114361f80acea15b1b
-Author: David Zbarsky <dzbarsky@gmail.com>
-Date:   Fri Oct 4 16:00:55 2024 -0400
-
-    patch
-
 diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
-index bba18bfd387a..c075d5fb3770 100644
+index 9a4e103be01e..693ebcedcfc2 100644
 --- a/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
 +++ b/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
-@@ -11,14 +11,11 @@ licenses(["notice"])
+@@ -11,18 +11,11 @@ licenses(["notice"])
  
  cc_library(
      name = "config",
@@ -19,6 +13,10 @@ index bba18bfd387a..c075d5fb3770 100644
 -            "COMPILER_RT_HAS_UNAME=1",
 -        ],
 -        # Will raise error unless supported platforms.
+-    }),
+-    target_compatible_with = select({
+-        "@platforms//os:linux": [],
+-        "//conditions:default": ["@platforms//:incompatible"],
 -    }),
 +    defines = [
 +        "COMPILER_RT_HAS_ATOMICS=1",
