@@ -107,6 +107,7 @@ pkg_files(
             "bin/clang-cpp": "./clang",
             "bin/ld.lld": "./lld",
             "bin/ld64.lld": "./lld",
+            "bin/wasm-ld": "./lld",
             "bin/llvm-strip": "./llvm-objcopy",
         },
     )
