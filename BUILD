@@ -95,6 +95,7 @@ pkg_files(
             ":bins" + suffix,
             "//:builtin_headers_pkg_files",
             "@llvm-raw//:libcxx_include",
+            "@llvm-raw//:libcxxabi_include",
         ] + select({
             "@bazel_tools//src/conditions:darwin": [":libclang_rt.profile_osx"],
             "@bazel_tools//src/conditions:linux_aarch64": [":libclang_rt.profile_aarch64"],

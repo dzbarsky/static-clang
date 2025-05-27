@@ -47,3 +47,12 @@ pkg_files(
     strip_prefix = "libcxx/include",
     prefix = "include/c++/v1",
 )
+
+pkg_files(
+    name = "libcxxabi_include",
+    srcs = glob(["libcxxabi/include/**"], exclude = [
+        "libcxxabi/include/CMakeLists.txt",
+    ]),
+    strip_prefix = "libcxxabi/include",
+    prefix = "include/c++/v1",
+)
