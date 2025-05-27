@@ -20,8 +20,6 @@ genrule(
 
 // Hardening.
 #define _LIBCPP_HARDENING_MODE_DEFAULT 2
-#define _LIBCPP_ENABLE_HARDENED_MODE_DEFAULT 0
-#define _LIBCPP_ENABLE_DEBUG_MODE_DEFAULT 0
 
 #endif // _LIBCPP___CONFIG_SITE' > $@""",
 )
