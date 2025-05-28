@@ -1,0 +1,35 @@
+diff --git a/tar/private/modify_mtree.awk b/tar/private/modify_mtree.awk
+index 54fd875..866e84f 100644
+--- a/tar/private/modify_mtree.awk
++++ b/tar/private/modify_mtree.awk
+@@ -1,15 +1,15 @@
+ # Edits mtree files. See the modify_mtree macro in /lib/tar.bzl.
+-function common_sections(path1, path2, i, segments1, segments2, min_length, common_path) {
++function common_sections(path1, path2, i, min_length, common_path) {
+     # Normalize paths (remove leading/trailing slashes)
+     gsub(/^\/|\/$/, "", path1)
+     gsub(/^\/|\/$/, "", path2)
+ 
+     # Split paths into arrays
+-    split(path1, segments1, "/")
+-    split(path2, segments2, "/")
++    n1 = split(path1, segments1, "/")
++    n2 = split(path2, segments2, "/")
+ 
+     # Determine the shortest path length
+-    min_length = (length(segments1) < length(segments2)) ? length(segments1) : length(segments2)
++    min_length = (n1 < n2) ? n1 : n2
+ 
+     # Find common sections
+     common_path = ""
+@@ -35,8 +35,8 @@ function make_relative_link(path1, path2, i, common, target, relative_path, back
+ 
+     # Count directories to go up from path2
+     back_steps = "../"
+-    split(relative_path, path2_segments, "/")
+-    for (i = 1; i < length(path2_segments); i++) {
++    n = split(relative_path, path2_segments, "/")
++    for (i = 1; i < n; i++) {
+         back_steps = back_steps "../"
+     }
+ 

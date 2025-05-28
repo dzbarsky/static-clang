@@ -1,6 +1,5 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@rules_pkg//pkg:mappings.bzl", "pkg_files", "strip_prefix")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 
 genrule(
@@ -33,7 +32,7 @@ copy_file(
 # TODO: gen module.modulemap
 # See https://github.com/llvm/llvm-project/blob/9eeb0293e27c0f1b44304fd9681dcd88fd9edc0a/llvm/utils/gn/secondary/libcxx/include/BUILD.gn#L62-L72
 
-pkg_files(
+filegroup(
     name = "libcxx_include",
     srcs = glob(["libcxx/include/**"], exclude = [
         "libcxx/include/CMakeLists.txt",
@@ -42,15 +41,11 @@ pkg_files(
         "libcxx/include/__assertion_handler",
         "libcxx/include/__config_site",
     ],
-    strip_prefix = "libcxx/include",
-    prefix = "include/c++/v1",
 )
 
-pkg_files(
+filegroup(
     name = "libcxxabi_include",
     srcs = glob(["libcxxabi/include/**"], exclude = [
         "libcxxabi/include/CMakeLists.txt",
     ]),
-    strip_prefix = "libcxxabi/include",
-    prefix = "include/c++/v1",
 )
