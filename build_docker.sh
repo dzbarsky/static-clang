@@ -2,7 +2,7 @@ set -eux
 
 docker stop bazel-builder || true
 docker rm bazel-builder || true
-docker build -t bazel-base-image .
+docker build --platform=linux/amd64 -t bazel-base-image .
 docker run --privileged --shm-size=4G \
   --mount type=bind,src="$(realpath $(dirname $0))",dst=/static-clang \
   --mount type=bind,src="$HOME/.bazelrc",dst=/home/fakeuser/.bazelrc \
