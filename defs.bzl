@@ -1,11 +1,11 @@
 def file(name, location):
-    return "%s uid=0 gid=0 time=1672560000 mode=0755 type=file content=$(location %s)" % (name, location)
+    return name + " uid=0 gid=0 time=1672560000 mode=0755 type=file content=$(location %s)" % location
 
 def link(name, target):
-    return "%s uid=0 gid=0 time=1672560000 mode=0755 type=link link=%s" % (name, target)
+    return name + " uid=0 gid=0 time=1672560000 mode=0755 type=link link=" + target
 
 def empty(name):
-    return link(name, "empty")
+    return name + " uid=0 gid=0 time=1672560000 mode=0755 type=file"
 
 def mtree(name, contents, outs, srcs = [], format={}):
     cmd = """\

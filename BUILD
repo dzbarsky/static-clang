@@ -105,6 +105,7 @@ mtree(
     contents = [
         file("bin/clang", "@llvm-project//clang:clang{strip_suffix}"),
         link("bin/clang-" + LLVM_VERSION_MAJOR, "clang"),
+        link("bin/clang++", "clang"),
         link("bin/clang-cpp", "clang"),
         file("bin/lld", "@llvm-project//lld:lld{strip_suffix}"),
         link("bin/ld.lld", "lld"),
