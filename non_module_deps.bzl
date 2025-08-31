@@ -11,6 +11,7 @@ def _non_module_deps_impl(mctx):
         patches = [
             "//:llvm-267e293510ad0e273443bc1b6c3655f6307e3992.patch",
             "//:llvm.patch",
+            "//:llvm-asan.patch",
             "//:fix_compiler_rt.patch",
             "//:libunwind.patch",
         ],

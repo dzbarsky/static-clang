@@ -1,0 +1,88 @@
+diff --git a/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel b/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
+index 791bca34fe33..8cd0c658e4bd 100644
+--- a/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
++++ b/utils/bazel/llvm-project-overlay/compiler-rt/BUILD.bazel
+@@ -110,3 +110,83 @@ cc_library(
+         ":orc_rt_common_headers",
+     ],
+ )
++
++cc_library(
++    name = "sanitizer_common",
++    includes = ["lib/sanitizer_common"],
++    hdrs = glob(["lib/sanitizer_common/*.h"]),
++    textual_hdrs = ["lib/sanitizer_common/sanitizer_flags.inc"],
++)
++
++cc_library(
++    name = "interception",
++    hdrs = glob(["lib/interception/*.h"]),
++    srcs = glob(["lib/interception/*.cpp"]),
++    includes = ["lib"],
++    deps = [":sanitizer_common"],
++)
++
++cc_library(
++    name = "lsan",
++    hdrs = glob(["lib/lsan/*.h"]),
++    srcs = glob(["lib/lsan/*.cpp"]),
++    includes = ["lib", "lib/lsan"],
++    textual_hdrs = ["lib/lsan/lsan_flags.inc"],
++    deps = [":sanitizer_common"],
++)
++  
++cc_library(
++    name = "asan",
++    srcs = [
++        "lib/asan/asan_allocator.cpp",
++        "lib/asan/asan_activation.cpp",
++        "lib/asan/asan_debugging.cpp",
++        "lib/asan/asan_descriptions.cpp",
++        "lib/asan/asan_errors.cpp",
++        "lib/asan/asan_fake_stack.cpp",
++        "lib/asan/asan_flags.cpp",
++        "lib/asan/asan_fuchsia.cpp",
++        "lib/asan/asan_globals.cpp",
++        "lib/asan/asan_globals_win.cpp",
++        "lib/asan/asan_interceptors.cpp",
++        "lib/asan/asan_interceptors_memintrinsics.cpp",
++        "lib/asan/asan_linux.cpp",
++        "lib/asan/asan_mac.cpp",
++        "lib/asan/asan_malloc_linux.cpp",
++        "lib/asan/asan_malloc_mac.cpp",
++        "lib/asan/asan_malloc_win.cpp",
++        "lib/asan/asan_memory_profile.cpp",
++        "lib/asan/asan_poisoning.cpp",
++        "lib/asan/asan_posix.cpp",
++        "lib/asan/asan_premap_shadow.cpp",
++        "lib/asan/asan_report.cpp",
++        "lib/asan/asan_rtl.cpp",
++        "lib/asan/asan_shadow_setup.cpp",
++        "lib/asan/asan_stack.cpp",
++        "lib/asan/asan_stats.cpp",
++        "lib/asan/asan_suppressions.cpp",
++        "lib/asan/asan_thread.cpp",
++        "lib/asan/asan_win.cpp",
++        "lib/asan/asan_new_delete.cpp",
++        "lib/asan/asan_rtl_static.cpp",
++    ] + select({
++        "@platforms//os:linux": ["lib/asan/asan_interceptors_vfork.S"],
++        "//conditions:default": []
++    }) + select({
++        # TODO: only x86
++        "@platforms//os:linux": ["lib/asan/asan_rtl_x86_64.S"],
++        "//conditions:default": []
++    }) + glob(["lib/asan/*.h"]),
++    textual_hdrs = [
++        "lib/asan/asan_flags.inc",
++        "lib/sanitizer_common/sanitizer_common_interceptors_memintrinsics.inc",
++    ],
++    includes = ["lib", "lib/asan"],
++    deps = [
++        ":config",
++        ":interception",
++        ":lsan",
++        ":sanitizer_common",
++    ],
++    linkstatic = True,
++)
