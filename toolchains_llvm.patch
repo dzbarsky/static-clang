@@ -1,0 +1,17 @@
+diff --git a/toolchain/internal/common.bzl b/toolchain/internal/common.bzl
+index 08f4e19..4229cca 100644
+--- a/toolchain/internal/common.bzl
++++ b/toolchain/internal/common.bzl
+@@ -38,9 +38,9 @@ _toolchain_tools = {
+     name: name
+     for name in [
+         "clang-cpp",
+-        "clang-format",
+-        "clang-tidy",
+-        "clangd",
++        #"clang-format",
++        #"clang-tidy",
++        #"clangd",
+         "ld.lld",
+         "llvm-ar",
+         "llvm-dwp",

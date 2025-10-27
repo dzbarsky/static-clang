@@ -1,6 +1,8 @@
 common --dynamic_mode=off
 # Upstream builds PIE, but it doesn't have much benefit when fully statically linked.
-#common --force_pic
+common --force_pic=true
+
+common --module_mirrors=https://bcr.cloudflaremirrors.com
 
 common --bes_results_url=https://app.buildbuddy.io/invocation/
 common --bes_backend=grpcs://remote.buildbuddy.io
@@ -13,9 +15,9 @@ common --noexperimental_throttle_remote_action_building
 common --jobs=800
 
 common --extra_execution_platforms=//rbe_platform
-common --host_platform=//rbe_platform
+#common --host_platform=//rbe_platform
 
-common --platforms @zig_sdk//libc_aware/platform:linux_amd64_musl
+#common --platforms @zig_sdk//libc_aware/platform:linux_amd64_musl
 common --experimental_platform_in_output_dir
 
 # LLVM-18 has empty globs
@@ -27,11 +29,14 @@ common --action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 common --host_action_env=BAZEL_DO_NOT_DETECT_CPP_TOOLCHAIN=1
 common --incompatible_strict_action_env
 
+common --action_env=FOO=bar
+
 # TODO(zbarsky): This doesn't compile due to "zlib.h" vs <zlib.h> usage.
 common --@llvm_zlib//:llvm_enable_zlib=false
 common --experimental_merged_skyframe_analysis_execution
 
-common --features=thin_lto
+# crashes with LTO...
+# common --features=thin_lto
 # ThinLTO feature doesn't exist in Zig toolchain, so we must set the flags manually.
 # It also doesn't support LTO on darwin targets, so we can't set this globally.
 # Instead, we configure copt/linkopt inside the toolchain itself (with a WORKSPACE patch).
@@ -42,3 +47,5 @@ common -c opt
 common --strip=always
 common --copt -ffunction-sections
 common --copt -fdata-sections
+common --copt -Wno-unused-command-line-argument
+common --host_copt -Wno-unused-command-line-argument

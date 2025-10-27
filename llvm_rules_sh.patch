@@ -1,0 +1,34 @@
+diff --git a/utils/bazel/WORKSPACE b/utils/bazel/WORKSPACE
+index eeb1c692ac87..d5a696f74a47 100644
+--- a/utils/bazel/WORKSPACE
++++ b/utils/bazel/WORKSPACE
+@@ -181,3 +181,17 @@ python_register_toolchains(
+     name = "python_3_12",
+     python_version = "3.12",
+ )
++
++maybe(
++    http_archive,
++    name = "rules_shell",
++    sha256 = "e6b87c89bd0b27039e3af2c5da01147452f240f75d505f5b6880874f31036307",
++    strip_prefix = "rules_shell-0.6.1",
++    url = "https://github.com/bazelbuild/rules_shell/releases/download/v0.6.1/rules_shell-v0.6.1.tar.gz",
++)
++
++load("@rules_shell//shell:repositories.bzl", "rules_shell_dependencies", "rules_shell_toolchains")
++
++rules_shell_dependencies()
++
++rules_shell_toolchains()
+diff --git a/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel b/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
+index d5ac3f88c166..efee1f078a94 100644
+--- a/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
++++ b/utils/bazel/llvm-project-overlay/llvm/BUILD.bazel
+@@ -5,6 +5,7 @@
+ load("@bazel_skylib//rules:common_settings.bzl", "string_flag")
+ load("@bazel_skylib//rules:expand_template.bzl", "expand_template")
+ load("@rules_python//python:defs.bzl", "py_binary")
++load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
+ load("//mlir:tblgen.bzl", "td_library")
+ load(":binary_alias.bzl", "binary_alias")
+ load(":config.bzl", "llvm_config_defines")

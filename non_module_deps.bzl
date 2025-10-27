@@ -13,6 +13,8 @@ def _non_module_deps_impl(mctx):
             "//:llvm.patch",
             "//:fix_compiler_rt.patch",
             "//:libunwind.patch",
+            "//:llvm_rules_sh.patch",
+            "//:llvm_disable_proto.patch",
         ],
         strip_prefix = "llvm-project-" + LLVM_COMMIT,
         urls = ["https://github.com/llvm/llvm-project/archive/{commit}.tar.gz".format(commit = LLVM_COMMIT)],

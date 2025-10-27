@@ -1,8 +1,9 @@
-bazel_dep(name = "aspect_bazel_lib", version = "2.14.0")
+bazel_dep(name = "aspect_bazel_lib", version = "2.21.2")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
-bazel_dep(name = "hermetic_cc_toolchain", version = "4.0.0")
+#bazel_dep(name = "hermetic_cc_toolchain", version = "4.0.0")
 bazel_dep(name = "rules_python", version = "1.4.1")
-bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_cc", version = "0.2.2")
+bazel_dep(name = "rules_shell", version = "0.6.1")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "tar.bzl", version = "0.3.0")
 single_version_override(
@@ -11,9 +12,6 @@ single_version_override(
     patch_strip = 1,
 )
 
-toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
-use_repo(toolchains, "zig_sdk")
-
 non_module_deps = use_extension("//:non_module_deps.bzl", "non_module_deps")
 use_repo(non_module_deps, "llvm-raw", "llvm_zlib", "llvm_zstd", "vulkan_headers")
 
@@ -21,7 +19,141 @@ llvm_configure = use_repo_rule("@llvm-raw//utils/bazel:configure.bzl", "llvm_con
 
 llvm_configure(name = "llvm-project")
 
-register_toolchains(
-    "@zig_sdk//toolchain/...",
-    "@zig_sdk//libc_aware/toolchain/...",
+#toolchains = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+#use_repo(toolchains, "zig_sdk")
+#
+#register_toolchains(
+#    "@zig_sdk//toolchain/...",
+#    "@zig_sdk//libc_aware/toolchain/...",
+#)
+
+bazel_dep(name = "toolchains_llvm", version = "1.4.0")
+single_version_override(
+    module_name = "toolchains_llvm",
+    patch_strip = 1,
+    patches = [
+        "//:toolchains_llvm.patch",
+    ],
 )
+
+STATIC_CLANG_VERSION = "17.0.6-4"
+
+SHA256S = {
+    "darwin-aarch64": "15433ce9ce9616804f4b97e956e66b3bfeaa5044c30c134e8ddd6a0b9b30d812",
+    "darwin-x86_64": "523ff6f3cc9fd8387e19556f0b62a07cc159fdd5b98d3043f3a66186c9da6666",
+    "linux-aarch64": "6addd32e411492161d8e59d1b488dae1146fe26e32f39f079e70c66b2c692232",
+    "linux-x86_64": "b46c7992115bd0f9315120bb6d7cbde3d8960ae627d0c5b187f61227bf6b7208",
+}
+
+STDLIBS = {
+    "darwin-aarch64": "builtin-libc++",
+    "darwin-x86_64": "builtin-libc++",
+    "linux-aarch64": "stdc++",
+    "linux-x86_64": "stdc++",
+}
+
+URLS = {
+    # Built from https://github.com/hyperbase/static-clang
+    "darwin-aarch64": ["https://airtable-build-dependencies-production.s3.amazonaws.com/hyperbase_dependencies/static-clang/%s/darwin_arm64_minimal.tar.xz" % STATIC_CLANG_VERSION],
+    "darwin-x86_64": ["https://airtable-build-dependencies-production.s3.amazonaws.com/hyperbase_dependencies/static-clang/%s/darwin_amd64_minimal.tar.xz" % STATIC_CLANG_VERSION],
+    "linux-aarch64": ["https://airtable-build-dependencies-production.s3.amazonaws.com/hyperbase_dependencies/static-clang/%s/linux_arm64_minimal.tar.xz" % STATIC_CLANG_VERSION],
+    "linux-x86_64": ["https://airtable-build-dependencies-production.s3.amazonaws.com/hyperbase_dependencies/static-clang/%s/linux_amd64_minimal.tar.xz" % STATIC_CLANG_VERSION],
+}
+
+llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+llvm.toolchain(
+    name = "llvm_toolchain",
+    llvm_version = "17.0.6",
+    sha256 = SHA256S,
+    #stdlib = STDLIBS,
+    urls = URLS,
+)
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+SYSROOT_BUILD_FILE_CONTENT = """
+filegroup(
+    name = "sysroot",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)"""
+
+http_archive(
+    name = "sysroot_darwin",
+    build_file_content = SYSROOT_BUILD_FILE_CONTENT,
+    strip_prefix = "sdk-macos-11.3-ccbaae84cc39469a6792108b24480a4806e09d59/root",
+    integrity = "sha256-EYcKSj04K3g0mGEIEmSSG7iDRAp+Cz3UoAc3PYcySjg=",
+    urls = ["https://github.com/hexops-graveyard/sdk-macos-11.3/archive/ccbaae84cc39469a6792108b24480a4806e09d59.tar.gz"],
+)
+
+llvm.sysroot(
+    name = "llvm_toolchain",
+    label = "@sysroot_darwin//:sysroot",
+    targets = [
+        "darwin-aarch64",
+        "darwin-x86_64",
+    ],
+)
+
+http_archive(
+    name = "org_chromium_sysroot_linux_aarch64",
+    build_file_content = SYSROOT_BUILD_FILE_CONTENT,
+    integrity = "sha256-zy/v3tBEnwbTz2NL+pT/7WDb5H8qFNKQCwDrm8+xBLg=",
+    url = "https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/80fc74e431f37f590d0c85f16a9d8709088929e8/debian_bullseye_arm64_sysroot.tar.xz",
+)
+
+llvm.sysroot(
+    name = "llvm_toolchain",
+    label = "@org_chromium_sysroot_linux_aarch64//:sysroot",
+    targets = ["linux-aarch64"],
+)
+
+http_archive(
+    name = "org_chromium_sysroot_linux_x86_64",
+    build_file_content = SYSROOT_BUILD_FILE_CONTENT,
+    integrity = "sha256-BLlLoQmLcfhUPLC6bDam6iiQ1NQXsEoIuQfZazikhXQ=",
+    url = "https://commondatastorage.googleapis.com/chrome-linux-sysroot/toolchain/f5f68713249b52b35db9e08f67184cac392369ab/debian_bullseye_amd64_sysroot.tar.xz",
+)
+
+llvm.sysroot(
+    name = "llvm_toolchain",
+    label = "@org_chromium_sysroot_linux_x86_64//:sysroot",
+    targets = ["linux-x86_64"],
+)
+use_repo(llvm, "llvm_toolchain")
+
+register_toolchains("@llvm_toolchain//:all")
+
+llvm.toolchain(
+    name = "llvm_toolchain_linux_exec",
+    llvm_version = "17.0.6",
+    sha256 = {"": "884ee67d647d77e58740c1e645649e29ae9e8a6fe87c1376be0f3a30f3cc9ab3"},
+    strip_prefix = {"": "clang+llvm-17.0.6-x86_64-linux-gnu-ubuntu-22.04"},
+    urls = {"": ["https://github.com/llvm/llvm-project/releases/download/llvmorg-17.0.6/clang+llvm-17.0.6-x86_64-linux-gnu-ubuntu-22.04.tar.xz"]},
+    #sha256 = SHA256S,
+    #stdlib = STDLIBS,
+    #urls = URLS,
+    exec_arch = "amd64",
+    exec_os = "linux",
+)
+llvm.sysroot(
+    name = "llvm_toolchain_linux_exec",
+    label = "@org_chromium_sysroot_linux_aarch64//:sysroot",
+    targets = ["linux-aarch64"],
+)
+llvm.sysroot(
+    name = "llvm_toolchain_linux_exec",
+    label = "@org_chromium_sysroot_linux_x86_64//:sysroot",
+    targets = ["linux-x86_64"],
+)
+llvm.sysroot(
+    name = "llvm_toolchain_linux_exec",
+    label = "@sysroot_darwin//:sysroot",
+    targets = [
+        "darwin-aarch64",
+        "darwin-x86_64",
+    ],
+)
+use_repo(llvm, "llvm_toolchain_linux_exec")
+
+register_toolchains("@llvm_toolchain_linux_exec//:all")
