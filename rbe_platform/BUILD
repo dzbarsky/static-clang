@@ -2,7 +2,6 @@ package(default_visibility = ["//visibility:public"])
 
 platform(
     name = "rbe_platform",
-    parents = ["@local_config_platform//:host"],
     constraint_values = [
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",

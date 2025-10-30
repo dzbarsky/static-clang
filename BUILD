@@ -1,5 +1,5 @@
-load("@aspect_bazel_lib//lib:copy_file.bzl", "copy_file")
-load("@aspect_bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
+load("@bazel_lib//lib:copy_file.bzl", "copy_file")
+load("@bazel_lib//lib:transitions.bzl", "platform_transition_filegroup")
 load("@llvm-project//:vars.bzl", "LLVM_VERSION_MAJOR")
 load("@tar.bzl", "mtree_mutate", "mtree_spec", "tar")
 load("//:defs.bzl", "file", "link", "empty", "mtree")
