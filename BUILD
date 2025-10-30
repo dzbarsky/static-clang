@@ -61,42 +61,50 @@ mtree_mutate(
 )
 
 # Note, there are some inconsistencies in naming so expanding the templates.
-LIB_PREFIX = "lib/clang/%s/lib/" % LLVM_VERSION_MAJOR
+#LIB_PREFIX = "lib/clang/%s/lib/" % LLVM_VERSION_MAJOR
+#
+#mtree(
+#    name = "libclang_rt.profile_osx_mtree",
+#    srcs = ["@llvm-project//compiler-rt:profile"],
+#    contents = [
+#        file(LIB_PREFIX + "darwin/libclang_rt.profile_osx.a", "@llvm-project//compiler-rt:profile"),
+#    ],
+#    outs = ["libclang_rt.profile_osx.mtree"],
+#)
+#
+#mtree(
+#    name = "libclang_rt.profile_aarch64_mtree",
+#    srcs = ["@llvm-project//compiler-rt:profile"],
+#    contents = [
+#        file(LIB_PREFIX + "linux/libclang_rt.profile-aarch64.a", "@llvm-project//compiler-rt:profile"),
+#    ],
+#    outs = ["libclang_rt.profile_aarch64.mtree"],
+#)
+#
+#mtree(
+#    name = "libclang_rt.profile_x86_64_mtree",
+#    srcs = ["@llvm-project//compiler-rt:profile"],
+#    contents = [
+#        file(LIB_PREFIX + "linux/libclang_rt.profile-x86_64.a", "@llvm-project//compiler-rt:profile"),
+#    ],
+#    outs = ["libclang_rt.profile_x86_64.mtree"],
+#)
+#
+#alias(
+#    name = "libclang_rt_mtree",
+#    actual = select({
+#        "@bazel_tools//src/conditions:darwin": ":libclang_rt.profile_osx_mtree",
+#        "@bazel_tools//src/conditions:linux_aarch64": ":libclang_rt.profile_aarch64_mtree",
+#        "@bazel_tools//src/conditions:linux_x86_64": ":libclang_rt.profile_x86_64_mtree",
+#    }),
+#)
 
 mtree(
-    name = "libclang_rt.profile_osx_mtree",
-    srcs = ["@llvm-project//compiler-rt:profile"],
-    contents = [
-        file(LIB_PREFIX + "darwin/libclang_rt.profile_osx.a", "@llvm-project//compiler-rt:profile"),
-    ],
-    outs = ["libclang_rt.profile_osx.mtree"],
-)
-
-mtree(
-    name = "libclang_rt.profile_aarch64_mtree",
-    srcs = ["@llvm-project//compiler-rt:profile"],
-    contents = [
-        file(LIB_PREFIX + "linux/libclang_rt.profile-aarch64.a", "@llvm-project//compiler-rt:profile"),
-    ],
-    outs = ["libclang_rt.profile_aarch64.mtree"],
-)
-
-mtree(
-    name = "libclang_rt.profile_x86_64_mtree",
-    srcs = ["@llvm-project//compiler-rt:profile"],
-    contents = [
-        file(LIB_PREFIX + "linux/libclang_rt.profile-x86_64.a", "@llvm-project//compiler-rt:profile"),
-    ],
-    outs = ["libclang_rt.profile_x86_64.mtree"],
-)
-
-alias(
     name = "libclang_rt_mtree",
-    actual = select({
-        "@bazel_tools//src/conditions:darwin": ":libclang_rt.profile_osx_mtree",
-        "@bazel_tools//src/conditions:linux_aarch64": ":libclang_rt.profile_aarch64_mtree",
-        "@bazel_tools//src/conditions:linux_x86_64": ":libclang_rt.profile_x86_64_mtree",
-    }),
+    contents = [
+        "lib/clang/17/lib uid=0 gid=0 time=1672560000 mode=0755 type=dir",
+    ],
+    outs = ["libclang_rt.mtree"]
 )
 
 mtree(
