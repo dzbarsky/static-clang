@@ -175,7 +175,7 @@ genrule(
 tar(
     name = "dist",
     srcs = TIER1_BINS + TIER2_BINS + [
-        "@llvm-project//compiler-rt:profile",
+        #"@llvm-project//compiler-rt:profile",
         "@llvm-project//clang:builtin_headers_files",
         "@llvm-raw//:libcxx_include",
         "@llvm-raw//:libcxxabi_include",
@@ -223,7 +223,7 @@ genrule(
 tar(
     name = "dist_minimal",
     srcs = TIER1_BINS + [
-        "@llvm-project//compiler-rt:profile",
+        #"@llvm-project//compiler-rt:profile",
         "@llvm-project//clang:builtin_headers_files",
         "@llvm-raw//:libcxx_include",
         "@llvm-raw//:libcxxabi_include",
