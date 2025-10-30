@@ -23,11 +23,11 @@ genrule(
 #endif // _LIBCPP___CONFIG_SITE' > $@""",
 )
 
-copy_file(
-    name = "write_assertion_handler",
-    src = "libcxx/vendor/llvm/default_assertion_handler.in",
-    out = "libcxx/include/__assertion_handler",
-)
+#copy_file(
+#    name = "write_assertion_handler",
+#    src = "libcxx/vendor/llvm/default_assertion_handler.in",
+#    out = "libcxx/include/__assertion_handler",
+#)
 
 # TODO: gen module.modulemap
 # See https://github.com/llvm/llvm-project/blob/9eeb0293e27c0f1b44304fd9681dcd88fd9edc0a/llvm/utils/gn/secondary/libcxx/include/BUILD.gn#L62-L72
@@ -38,7 +38,7 @@ filegroup(
         "libcxx/include/CMakeLists.txt",
         "libcxx/include/__config_site.in",
     ]) + [
-        "libcxx/include/__assertion_handler",
+        #"libcxx/include/__assertion_handler",
         "libcxx/include/__config_site",
     ],
 )
