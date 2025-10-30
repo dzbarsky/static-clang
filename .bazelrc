@@ -1,3 +1,5 @@
+common --module_mirrors=https://bcr.cloudflaremirrors.com
+
 common --dynamic_mode=off
 # Upstream builds PIE, but it doesn't have much benefit when fully statically linked.
 #common --force_pic
