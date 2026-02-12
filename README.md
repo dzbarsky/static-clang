@@ -1,3 +1,12 @@
+# DEPRECATED
+This project is no longer receiving updates. Development has been subsumed to https://github.com/cerisier/toolchains_llvm_bootstrapped which provides smaller, more optimized, and more feature complete toolchain distributions, as well as a fully featured Bazel cc_toolchain, with full support for LLVM runtimes, sanitizers, from-source bootstraps, and more.
+
+If you are only interested in consuming a statically-linked prebuilt LLVM, look for an [LLVM prebuilts release](https://github.com/cerisier/toolchains_llvm_bootstrapped/releases).
+If you are a Bazel user, check the [README for directions](https://github.com/cerisier/toolchains_llvm_bootstrapped/blob/main/README.md) how to integrate into your build.
+
+Please migrate your usage and reach out to us on that repository!
+
+# Historical README
 This repository builds a custom LLVM distribution that comes with statically linked tools (clang, lld, llvm-ar, llvm-as, llvm-nm, llvm-objcopy). This is the minimum set needed to use the outputs as a Bazel cc toolchain with [toolchains_llvm](https://github.com/bazel-contrib/toolchains_llvm) (previously grailbio/bazel-toolchain).
 
 ### Linux
@@ -24,4 +33,4 @@ You can also cross-compile for a different platform:
 - `bazel build //:for_all_platforms` (builds all of the above)
 
 ## Roadmap
-This satifies my current needs, but I'm happy to tag additional releases as LLVM upstream releases them. I will probably add additional binaries that are used in Bazel as I need them: llvm-cov, llvm-dwp, llvm-objdump, llvm-profdata. I'm also open to adding extra pre-built artifacts with a more full set of tools (flang, clang-format, etc.) if there is interest.
+Please migrate to https://github.com/cerisier/toolchains_llvm_bootstrapped to continue following along our [roadmap](https://github.com/cerisier/toolchains_llvm_bootstrapped/milestone/1).
